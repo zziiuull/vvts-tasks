@@ -3,7 +3,6 @@ package br.ifsp.demo.security.auth;
 import br.ifsp.demo.controller.BaseApiIntegrationTest;
 import br.ifsp.demo.controller.EntityBuilder;
 import br.ifsp.demo.security.user.User;
-import io.restassured.RestAssured;
 import io.restassured.filter.log.LogDetail;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
