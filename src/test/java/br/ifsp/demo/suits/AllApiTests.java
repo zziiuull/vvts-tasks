@@ -7,7 +7,7 @@ import org.junit.platform.suite.api.SuiteDisplayName;
 
 @Suite
 @SelectPackages("br.ifsp.demo.tasks")
-@SuiteDisplayName("All Integration Tests")
-@IncludeTags({"IntegrationTest"})
-public class AllIntegrationTests {
+@SuiteDisplayName("All API Tests")
+@IncludeTags({"ApiTest"})
+public class AllApiTests {
 }
