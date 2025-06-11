@@ -22,7 +22,8 @@ public class BaseApiIntegrationTest {
 
     @BeforeEach
     public void generalSetup() {
-        RestAssured.baseURI = "http://localhost:8080";
+        RestAssured.baseURI = "http://localhost:" + port;
+        RestAssured.port = port;
     }
 
     @AfterEach
@@ -41,7 +42,7 @@ public class BaseApiIntegrationTest {
         RestTemplate restTemplate = new RestTemplate();
         AuthRequest authRequest =  new AuthRequest(email, password);
         final AuthResponse authResponse = restTemplate.postForObject(
-                RestAssured.baseURI + "api/v1/authenticate",
+                RestAssured.baseURI + "/api/v1/authenticate" ,
                 authRequest,
                 AuthResponse.class);
         return authResponse.token();
