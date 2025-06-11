@@ -1,2 +1,13 @@
-package br.ifsp.demo.suits;public class AllPersistenceTests {
+package br.ifsp.demo.suits;
+
+import org.junit.platform.suite.api.IncludeTags;
+import org.junit.platform.suite.api.SelectPackages;
+import org.junit.platform.suite.api.Suite;
+import org.junit.platform.suite.api.SuiteDisplayName;
+
+@Suite
+@SelectPackages("br.ifsp.demo.tasks")
+@SuiteDisplayName("All Persistence Tests")
+@IncludeTags({"PersistenceTests"})
+public class AllPersistenceTests {
 }
