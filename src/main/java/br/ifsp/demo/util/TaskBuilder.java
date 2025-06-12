@@ -22,4 +22,14 @@ public class TaskBuilder {
                 .build();
     }
 
+    public static TaskEntity randomTask(UUID userId) {
+        return TaskEntity.builder()
+                .id(UUID.randomUUID())
+                .title(faker.lorem().sentence(3))
+                .description(faker.lorem().paragraph())
+                .deadline(LocalDateTime.now().plusDays(faker.number().numberBetween(1, 10)))
+                .status(TaskStatus.PENDING)
+                .userId(userId)
+                .build();
+    }
 }
