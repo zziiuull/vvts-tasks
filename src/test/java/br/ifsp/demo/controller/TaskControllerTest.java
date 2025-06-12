@@ -283,6 +283,30 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                     .when().put("api/v1/task/clock-in/" + nonExistentId)
                     .then().statusCode(HttpStatus.NOT_FOUND.value());
             }
+
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return 403 if task does not belong to user")
+            void shouldReturn403IfTaskDoesNotBelongToUser() {
+                User userA = registerUser("123");
+                String tokenA = authenticate(userA.getEmail(), "123");
+
+                User userB = registerUser("456");
+                String tokenB = authenticate(userB.getEmail(), "456");
+
+                ResponseTaskDTO taskFromA =
+                    given().contentType("application/json")
+                        .header("Authorization", "Bearer " + tokenA)
+                        .body(EntityBuilder.createRandomCreateTaskDTO())
+                    .when().post("api/v1/task/create")
+                    .then().statusCode(HttpStatus.CREATED.value())
+                    .extract().as(ResponseTaskDTO.class);
+
+                given().header("Authorization", "Bearer " + tokenB)
+                    .when().put("api/v1/task/clock-in/" + taskFromA.id())
+                    .then().statusCode(HttpStatus.FORBIDDEN.value());
+            }
         }
     }
 }
