@@ -32,4 +32,17 @@ public class TaskBuilder {
                 .userId(userId)
                 .build();
     }
+
+    public static TaskEntity completedTask(UUID userId) {
+        return TaskEntity.builder()
+                .id(UUID.randomUUID())
+                .title("Finalizado")
+                .status(TaskStatus.COMPLETED)
+                .deadline(LocalDateTime.now())
+                .startTime(LocalDateTime.now().minusHours(2))
+                .finishTime(LocalDateTime.now())
+                .timeSpent(120L)
+                .userId(userId)
+                .build();
+    }
 }
