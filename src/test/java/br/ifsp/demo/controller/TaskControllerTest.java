@@ -79,7 +79,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
         class BadRequest {
             @Test
             @Tag("ApiTest")
-            @Tag("Should return a bad request status code when createTaskDTO title is blank")
+            @DisplayName("Should return a bad request status code when createTaskDTO title is blank")
             void shouldReturnABadRequestStatusCodeWhenCreateTaskDTOTitleIsBlank() {
                 String password = "user123";
                 User user = registerUser(password);
@@ -107,7 +107,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
 
             @Test
             @Tag("ApiTest")
-            @Tag("Should return a bad request status code when createTaskDTO deadline is in past")
+            @DisplayName("Should return a bad request status code when createTaskDTO deadline is in past")
             void shouldReturnABadRequestStatusCodeWhenCreateTaskDTODeadlineIsInPast() {
                 String password = "user123";
                 User user = registerUser(password);
