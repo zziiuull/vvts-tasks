@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,6 +53,17 @@ class JpaTaskRepositoryTest {
     void shouldReturnEmptyListForUserWithoutTasks() {
         List<TaskEntity> result = taskRepository.findAllByUserId(userB);
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    @Tag("PersistenceTest")
+    @Tag("IntegrationTest")
+    @DisplayName("Should find task by id and user id")
+    void shouldFinddTaskByIdAndUserId() {
+        Optional<TaskEntity> result = taskRepository.findByIdAndUserId(taskA.getId(), userA);
+
+        assertThat(result).isPresent();
+        assertThat(result.get().getTitle()).isEqualTo(taskA.getTitle());
     }
 
 }
