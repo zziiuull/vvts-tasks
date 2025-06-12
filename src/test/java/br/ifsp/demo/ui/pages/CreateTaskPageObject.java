@@ -1,4 +1,4 @@
-package br.ifsp.demo.ui;
+package br.ifsp.demo.ui.pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -26,9 +26,10 @@ public class CreateTaskPageObject extends BasePageObject {
         deadline.sendKeys(taskDeadline);
     }
 
-    public void submitTask() {
+    public TaskListPageObject submitTask() {
         var submitButton = driver.findElement(By.id("create-task-btn"));
         submitButton.click();
+        return new TaskListPageObject(driver);
     }
 
     public String errorMessage(){
