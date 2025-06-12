@@ -45,4 +45,13 @@ class JpaTaskRepositoryTest {
         assertThat(result.getFirst().getUserId()).isEqualTo(userA);
     }
 
+    @Test
+    @Tag("PersistenceTest")
+    @Tag("IntegrationTest")
+    @DisplayName("Should return empty list for user without tasks")
+    void shouldReturnEmptyListForUserWithoutTasks() {
+        List<TaskEntity> result = taskRepository.findAllByUserId(userB);
+        assertThat(result).isEmpty();
+    }
+
 }
