@@ -88,20 +88,20 @@ class TaskControllerTest extends BaseApiIntegrationTest {
 
                 final ResponseTaskDTO response =
                         given().contentType("application/json")
-                                .header("Authorization", "Bearer " + token)
-                                .body(createTaskDTO)
+                            .header("Authorization", "Bearer " + token)
+                            .body(createTaskDTO)
                         .when()
-                                .post("/api/v1/task/create")
+                            .post("/api/v1/task/create")
                         .then()
-                                .statusCode(HttpStatus.CREATED.value())
-                                .extract()
-                                .as(ResponseTaskDTO.class);
+                            .statusCode(HttpStatus.CREATED.value())
+                            .extract()
+                            .as(ResponseTaskDTO.class);
 
-                given().header("Authorization", "Bearer" + token)
-                        .when()
-                        .put("/api/v1/task/mark-completed/" + response.id())
-                        .then()
-                        .statusCode(HttpStatus.NO_CONTENT.value());
+                given().header("Authorization", "Bearer " + token)
+                    .when()
+                    .put("/api/v1/task/mark-completed/" + response.id())
+                    .then()
+                    .statusCode(HttpStatus.NO_CONTENT.value());
 
                 TaskEntity updated = taskRepository.findById(response.id()).orElseThrow();
                 assertThat(updated.getStatus().name()).isEqualTo("COMPLETED");
@@ -118,11 +118,38 @@ class TaskControllerTest extends BaseApiIntegrationTest {
 
                 UUID randomId = UUID.randomUUID();
 
-                given().header("Authorization", "Bearer" + token)
-                        .when()
-                        .put("/api/v1/task/mark-completed/" + randomId)
-                        .then()
-                        .statusCode(HttpStatus.NOT_FOUND.value());
+                given().header("Authorization", "Bearer " + token)
+                    .when()
+                    .put("/api/v1/task/mark-completed/" + randomId)
+                    .then()
+                    .statusCode(HttpStatus.NOT_FOUND.value());
+            }
+
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return 403 if task belongs to another user")
+            void shouldReturn403IfNotOwner() {
+                String passA = "123";
+                User userA = registerUser(passA);
+                String tokenA = authenticate(userA.getEmail(), passA);
+
+                String passB = "456";
+                User userB = registerUser(passB);
+                String tokenB = authenticate(userB.getEmail(), passB);
+
+                CreateTaskDTO dto = EntityBuilder.createRandomCreateTaskDTO();
+                ResponseTaskDTO taskCreated =
+                        given().contentType("application/json")
+                            .header("Authorization", "Bearer " + tokenA)
+                            .body(dto)
+                        .when().post("/api/v1/task/create")
+                        .then().statusCode(HttpStatus.CREATED.value())
+                        .extract().as(ResponseTaskDTO.class);
+
+                given().header("Authorization", "Bearer " + tokenB)
+                    .when().put("/api/v1/task/mark-completed/" + taskCreated.id())
+                    .then().statusCode(HttpStatus.FORBIDDEN.value());
             }
         }
     }
