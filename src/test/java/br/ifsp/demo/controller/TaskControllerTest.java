@@ -256,12 +256,12 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                     given().contentType("application/json")
                         .header("Authorization", "Bearer " + token)
                         .body(dto)
-                    .when().post("api/v1/task/create")
+                    .when().post("/api/v1/task/create")
                     .then().statusCode(HttpStatus.CREATED.value())
                     .extract().as(ResponseTaskDTO.class);
 
                 given().header("Authorization", "Bearer " + token)
-                    .when().put("api/v1/task/clock-in/" + createdTask.id())
+                    .when().put("/api/v1/task/clock-in/" + createdTask.id())
                     .then().statusCode(HttpStatus.NO_CONTENT.value());
 
                 TaskEntity updated = taskRepository.findById(createdTask.id()).orElseThrow();
@@ -280,7 +280,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                 UUID nonExistentId = UUID.randomUUID();
 
                 given().header("Authorization", "Bearer " + token)
-                    .when().put("api/v1/task/clock-in/" + nonExistentId)
+                    .when().put("/api/v1/task/clock-in/" + nonExistentId)
                     .then().statusCode(HttpStatus.NOT_FOUND.value());
             }
 
@@ -299,12 +299,12 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                     given().contentType("application/json")
                         .header("Authorization", "Bearer " + tokenA)
                         .body(EntityBuilder.createRandomCreateTaskDTO())
-                    .when().post("api/v1/task/create")
+                    .when().post("/api/v1/task/create")
                     .then().statusCode(HttpStatus.CREATED.value())
                     .extract().as(ResponseTaskDTO.class);
 
                 given().header("Authorization", "Bearer " + tokenB)
-                    .when().put("api/v1/task/clock-in/" + taskFromA.id())
+                    .when().put("/api/v1/task/clock-in/" + taskFromA.id())
                     .then().statusCode(HttpStatus.FORBIDDEN.value());
             }
         }
@@ -327,16 +327,16 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                     given().contentType("application/json")
                         .header("Authorization", "Bearer " + token)
                         .body(dto)
-                    .when().post("api/v1/task/create")
+                    .when().post("/api/v1/task/create")
                     .then().statusCode(HttpStatus.CREATED.value())
                     .extract().as(ResponseTaskDTO.class);
 
                 given().header("Authorization", "Bearer " + token)
-                    .when().put("api/v1/task/clock-in/" + createdTask.id())
+                    .when().put("/api/v1/task/clock-in/" + createdTask.id())
                     .then().statusCode(HttpStatus.NO_CONTENT.value());
 
                 given().header("Authorization", "Bearer " + token)
-                    .when().put("api/v1/task/clock-out/" + createdTask.id())
+                    .when().put("/api/v1/task/clock-out/" + createdTask.id())
                     .then().statusCode(HttpStatus.NO_CONTENT.value());
 
                 TaskEntity updated = taskRepository.findById(createdTask.id()).orElseThrow();
@@ -374,17 +374,60 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                     given().contentType("application/json")
                         .header("Authorization", "Bearer " + tokenA)
                         .body(EntityBuilder.createRandomCreateTaskDTO())
-                        .when().post("api/v1/task/create")
+                        .when().post("/api/v1/task/create")
                         .then().statusCode(HttpStatus.CREATED.value())
                         .extract().as(ResponseTaskDTO.class);
 
                 given().header("Authorization", "Bearer " + tokenA)
-                    .when().put("api/v1/task/clock-in/" + taskCreated.id())
+                    .when().put("/api/v1/task/clock-in/" + taskCreated.id())
                     .then().statusCode(HttpStatus.NO_CONTENT.value());
 
                 given().header("Authorization", "Bearer " + tokenB)
-                    .when().put("api/v1/task/clock-out/" + taskCreated.id())
+                    .when().put("/api/v1/task/clock-out/" + taskCreated.id())
                     .then().statusCode(HttpStatus.FORBIDDEN.value());
+            }
+        }
+
+        @Nested
+        @DisplayName("GET /spent-time/{id}")
+        class SpentTimeTests {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return spent time of task with 200")
+            void shouldReturnSpentTimeOfTaskWith200() {
+
+                String password = "abc123";
+                User user = registerUser(password);
+                String token = authenticate(user.getEmail(), password);
+
+                CreateTaskDTO dto = EntityBuilder.createRandomCreateTaskDTO();
+                ResponseTaskDTO createdTask =
+                    given().contentType("application/json")
+                        .header("Authorization", "Bearer " + token)
+                        .body(dto)
+                        .when().post("/api/v1/task/create")
+                        .then().statusCode(HttpStatus.CREATED.value())
+                        .extract().as(ResponseTaskDTO.class);
+
+                given().header("Authorization", "Bearer " + token)
+                    .when().put("/api/v1/task/clock-in/" + createdTask.id())
+                    .then().statusCode(HttpStatus.NO_CONTENT.value());
+
+                given().header("Authorization", "Bearer " + token)
+                        .when().put("/api/v1/task/clock-out/" + createdTask.id())
+                        .then().statusCode(HttpStatus.NO_CONTENT.value());
+
+                final Integer timeSpent =
+                        given().header("Authorization", "Bearer " + token)
+                                .when().get("/api/v1/task/spent-time/" + createdTask.id())
+                                .then()
+                                .statusCode(HttpStatus.OK.value())
+                                .extract()
+                                .jsonPath().getInt("status");
+
+                TaskEntity task = taskRepository.findById(createdTask.id()).orElseThrow();
+                assertThat(timeSpent).isEqualTo(task.getTimeSpent().intValue());
             }
         }
     }
