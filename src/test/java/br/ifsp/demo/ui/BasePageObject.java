@@ -8,4 +8,8 @@ public class BasePageObject {
     public BasePageObject(WebDriver driver) {
         this.driver = driver;
     }
+
+    public String pageTitle(){
+        return driver.getTitle();
+    }
 }
