@@ -66,4 +66,13 @@ class JpaTaskRepositoryTest {
         assertThat(result.get().getTitle()).isEqualTo(taskA.getTitle());
     }
 
+    @Test
+    @Tag("PersistenceTest")
+    @Tag("IntegrationTest")
+    @DisplayName("Should return empty when task does not belong to user")
+    void shouldReturnEmptyWhenTaskDoesNotBelongToUser() {
+        Optional<TaskEntity> result = taskRepository.findByIdAndUserId(taskA.getId(), userB);
+        assertThat(result).isEmpty();
+    }
+
 }
