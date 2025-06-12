@@ -267,6 +267,22 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                 TaskEntity updated = taskRepository.findById(createdTask.id()).orElseThrow();
                 assertThat(updated.getStartTime()).isNotNull();
             }
+
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return 404 when task does not exist")
+            void shouldReturn404WhenTaskDoesNotExist() {
+                String password = "pass123";
+                User user = registerUser(password);
+                String token = authenticate(user.getEmail(), password);
+
+                UUID nonExistentId = UUID.randomUUID();
+
+                given().header("Authorization", "Bearer " + token)
+                    .when().put("api/v1/task/clock-in/" + nonExistentId)
+                    .then().statusCode(HttpStatus.NOT_FOUND.value());
+            }
         }
     }
 }
