@@ -237,5 +237,36 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                     .then().statusCode(HttpStatus.FORBIDDEN.value());
             }
         }
+
+        @Nested
+        @DisplayName("PUT /clock-in/{id}")
+        class ClockInTests {
+
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should clock-in task and return 204")
+            void shouldClockInTaskAndReturn204() {
+                String password = "abc123";
+                User user = registerUser(password);
+                String token = authenticate(user.getEmail(), password);
+                CreateTaskDTO dto = EntityBuilder.createRandomCreateTaskDTO();
+
+                ResponseTaskDTO createdTask =
+                    given().contentType("application/json")
+                        .header("Authorization", "Bearer " + token)
+                        .body(dto)
+                    .when().post("api/v1/task/create")
+                    .then().statusCode(HttpStatus.CREATED.value())
+                    .extract().as(ResponseTaskDTO.class);
+
+                given().header("Authorization", "Bearer " + token)
+                    .when().put("api/v1/task/clock-in/" + createdTask.id())
+                    .then().statusCode(HttpStatus.NO_CONTENT.value());
+
+                TaskEntity updated = taskRepository.findById(createdTask.id()).orElseThrow();
+                assertThat(updated.getStartTime()).isNotNull();
+            }
+        }
     }
 }
