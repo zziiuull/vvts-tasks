@@ -445,6 +445,30 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                         .when().get("/api/v1/task/spent-time/" + invalidId)
                         .then().statusCode(HttpStatus.NOT_FOUND.value());
             }
+
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return forbidden if user does not own task")
+            void shouldReturnForbiddenIfUserDoesNotOwnTask() {
+                User userA = registerUser("passA");
+                String tokenA = authenticate(userA.getEmail(), "passA");
+
+                User userB = registerUser("passB");
+                String tokenB = authenticate(userB.getEmail(), "passB");
+
+                ResponseTaskDTO task =
+                    given().contentType("application/json")
+                        .header("Authorization", "Bearer" + tokenA)
+                        .body(EntityBuilder.createRandomCreateTaskDTO())
+                        .when().post("/api/v1/task/create")
+                        .then().statusCode(HttpStatus.CREATED.value())
+                        .extract().as(ResponseTaskDTO.class);
+
+                given().header("Authorization", "Bearer " + tokenB)
+                    .when().get("/api/v1/task/spent-time/" + task.id())
+                    .then().statusCode(HttpStatus.FORBIDDEN.value());
+            }
         }
     }
 }
