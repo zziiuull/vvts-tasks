@@ -68,5 +68,43 @@ class TaskControllerTest extends BaseApiIntegrationTest {
             assertThat(found.getSuggestion()).isNull();
             assertThat(found.getUserId()).isEqualTo(user.getId());
         }
+
+        @Nested
+        @DisplayName("PUT /mark-completed/{id}")
+        class MarkCompletedTests {
+
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should mark a task as completed and return 204")
+            void shouldMarkATaskAsCompletedAndReturn204() {
+
+                String password = "abc123";
+                User user = registerUser(password);
+                String token = authenticate(user.getEmail(), password);
+
+                CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+
+                final ResponseTaskDTO response =
+                        given().contentType("application/json")
+                                .header("Authorization", "Bearer " + token)
+                                .body(createTaskDTO)
+                        .when()
+                                .post("/api/v1/task/create")
+                        .then()
+                                .statusCode(HttpStatus.CREATED.value())
+                                .extract()
+                                .as(ResponseTaskDTO.class);
+
+                given().header("Authorization", "Bearer" + token)
+                        .when()
+                        .put("/api/v1/task/mark-completed/" + response.id())
+                        .then()
+                        .statusCode(HttpStatus.NO_CONTENT.value());
+
+                TaskEntity updated = taskRepository.findById(response.id()).orElseThrow();
+                assertThat(updated.getStatus().name()).isEqualTo("COMPLETED");
+            }
+        }
     }
 }
