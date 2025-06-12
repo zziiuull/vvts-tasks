@@ -132,5 +132,26 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                         .statusCode(HttpStatus.BAD_REQUEST.value());
             }
         }
+
+        @Nested
+        @DisplayName("401 unauthorized")
+        class Unauthorized {
+            @Test
+            @Tag("ApiTest")
+            @DisplayName("Should return an unauthorized status code when user is unauthorized")
+            void shouldReturnAnUnauthorizedStatusCodeWhenUserIsUnauthorized() {
+                final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+
+                given().contentType("application/json")
+                    .port(RestAssured.port)
+                    .body(createTaskDTO)
+                .when()
+                    .post("api/v1/task/create")
+                .then()
+                    .log()
+                    .ifValidationFails(LogDetail.BODY)
+                    .statusCode(HttpStatus.UNAUTHORIZED.value());
+            }
+        }
     }
 }
