@@ -104,6 +104,33 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                     .ifValidationFails(LogDetail.BODY)
                     .statusCode(HttpStatus.BAD_REQUEST.value());
             }
+
+            @Test
+            @Tag("ApiTest")
+            @Tag("Should return a bad request status code when createTaskDTO title is blank")
+            void shouldReturnABadRequestStatusCodeWhenCreateTaskDTODeadlineIsInPast() {
+                String password = "user123";
+                User user = registerUser(password);
+                final String token = authenticate(user.getEmail(), password);
+                final CreateTaskDTO invalidCreateTaskDTO = new CreateTaskDTO(
+                        "Title",
+                        "Descrição",
+                        LocalDateTime.now().minusMinutes(10),
+                        10L,
+                        "Sugestão"
+                );
+
+                given().contentType("application/json")
+                        .port(RestAssured.port)
+                        .body(invalidCreateTaskDTO)
+                        .header("Authorization", "Bearer " + token)
+                        .when()
+                        .post("api/v1/task/create")
+                        .then()
+                        .log()
+                        .ifValidationFails(LogDetail.BODY)
+                        .statusCode(HttpStatus.BAD_REQUEST.value());
+            }
         }
     }
 }
