@@ -342,6 +342,22 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                 TaskEntity updated = taskRepository.findById(createdTask.id()).orElseThrow();
                 assertThat(updated.getFinishTime()).isNotNull();
             }
+
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return 404 if task not found")
+            void shouldReturn404IfTaskNotFound() {
+                String password = "pass123";
+                User user = registerUser(password);
+                String token = authenticate(user.getEmail(), password);
+
+                UUID fakeId = UUID.randomUUID();
+
+                given().header("Authorization", "Bearer " + token)
+                    .when().put("/api/v1/task/clock-out/" + fakeId)
+                    .then().statusCode(HttpStatus.NOT_FOUND.value());
+            }
         }
     }
 }
