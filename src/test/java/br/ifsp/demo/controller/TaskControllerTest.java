@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -104,6 +105,24 @@ class TaskControllerTest extends BaseApiIntegrationTest {
 
                 TaskEntity updated = taskRepository.findById(response.id()).orElseThrow();
                 assertThat(updated.getStatus().name()).isEqualTo("COMPLETED");
+            }
+
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return 404 if task does not exist")
+            void shouldReturn404IfTaskDoesNotExist() {
+                String password = "pass123";
+                User user = registerUser(password);
+                String token = authenticate(user.getEmail(), password);
+
+                UUID randomId = UUID.randomUUID();
+
+                given().header("Authorization", "Bearer" + token)
+                        .when()
+                        .put("/api/v1/task/mark-completed/" + randomId)
+                        .then()
+                        .statusCode(HttpStatus.NOT_FOUND.value());
             }
         }
     }
