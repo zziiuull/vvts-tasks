@@ -28,5 +28,11 @@ public class LoginPageObject extends BasePageObject {
         driver.findElement(passwordField).sendKeys(password);
     }
 
+    public void clickLogin() {
+        driver.findElement(loginButton).click();
+    }
 
+    public void clickRegister() {
+        driver.findElement(registerButton).click();
+    }
 }
