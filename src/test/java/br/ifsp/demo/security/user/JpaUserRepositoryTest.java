@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,5 +47,20 @@ class JpaUserRepositoryTest {
         Optional<User> result = userRepository.findByEmail("notfound@ifsp.edu.br");
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    @Tag("PersistenceTest")
+    @Tag("IntegrationTest")
+    @DisplayName("Should save and retrieve user with specific Id")
+    void shouldSaveAndRetrieveUserWithSpecificId() {
+        UUID specificId = UUID.randomUUID();
+        User customUser = UserBuilder.withIdAndEmail(specificId, "custom@ifsp.edu.br");
+        userRepository.save(customUser);
+
+        Optional<User> found = userRepository.findById(specificId);
+
+        assertThat(found).isPresent();
+        assertThat(found.get().getEmail()).isEqualTo("custom@ifsp.edu.br");
     }
 }
