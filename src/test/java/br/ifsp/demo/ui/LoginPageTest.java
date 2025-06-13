@@ -4,9 +4,15 @@ import br.ifsp.demo.ui.pages.LoginPageObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
+
+import java.time.Duration;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class LoginPageTest extends BaseSeleniumTest {
 
@@ -25,5 +31,20 @@ class LoginPageTest extends BaseSeleniumTest {
         loginPage.clickLogin();
         String error = loginPage.waitForErrorMessage();
         assertThat(error).isNotBlank();
+    }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should navigate to register page")
+    void shouldNavigateToRegisterPage() {
+        loginPage.clickRegister();
+
+        Wait<WebDriver> wait = new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(300))
+                .ignoring(NoSuchElementException.class);
+
+        wait.until(webDriver -> Objects.requireNonNull(webDriver.getTitle()).equalsIgnoreCase("Register"));
+        assertThat(driver.getTitle()).isEqualTo("Register");
     }
 }
