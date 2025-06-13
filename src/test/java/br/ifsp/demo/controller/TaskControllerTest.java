@@ -376,8 +376,8 @@ class TaskControllerTest extends BaseApiIntegrationTest {
             @Test
             @Tag("ApiTest")
             @Tag("IntegrationTest")
-            @DisplayName("Should return an ok status code when getting all tasks")
-            void shouldReturnAnOkStatusCodeWhenGettingAllTasks(){
+            @DisplayName("Should return an ok status code when retrieving all tasks")
+            void shouldReturnAnOkStatusCodeWhenRetrievingAllTasks(){
                 final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
 
                 final ResponseTaskDTO response =
@@ -435,8 +435,8 @@ class TaskControllerTest extends BaseApiIntegrationTest {
             @Test
             @Tag("ApiTest")
             @Tag("IntegrationTest")
-            @DisplayName("Should return an unauthorized status code when getting all tasks user is unauthorized")
-            void shouldReturnAnUnauthorizedStatusCodeWhenGettingAllTasksAndUserIsUnauthorized() {
+            @DisplayName("Should return an unauthorized status code when retrieving all tasks user is unauthorized")
+            void shouldReturnAnUnauthorizedStatusCodeWhenRetrievingAllTasksAndUserIsUnauthorized() {
                 given().contentType("application/json")
                         .port(RestAssured.port)
                         .when()
@@ -458,8 +458,8 @@ class TaskControllerTest extends BaseApiIntegrationTest {
             @Test
             @Tag("ApiTest")
             @Tag("IntegrationTest")
-            @DisplayName("Should return an ok status code when getting a task")
-            void shouldReturnAnOkStatusCodeWhenGettingATask(){
+            @DisplayName("Should return an ok status code when retrieving a task")
+            void shouldReturnAnOkStatusCodeWhenRetrievingATask(){
                 final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
 
                 final ResponseTaskDTO response =
@@ -511,8 +511,8 @@ class TaskControllerTest extends BaseApiIntegrationTest {
             @Test
             @Tag("ApiTest")
             @Tag("IntegrationTest")
-            @DisplayName("Should return an unauthorized status code when getting a task and user is unauthorized")
-            void shouldReturnAnUnauthorizedStatusCodeWhenGettingATaskAndUserIsUnauthorized() {
+            @DisplayName("Should return an unauthorized status code when retrieving a task and user is unauthorized")
+            void shouldReturnAnUnauthorizedStatusCodeWhenRetrievingATaskAndUserIsUnauthorized() {
                 given()
                     .contentType("application/json")
                     .port(RestAssured.port)
@@ -524,15 +524,15 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                     .statusCode(HttpStatus.UNAUTHORIZED.value());
             }
         }
-        
+
         @Nested
         @DisplayName("404 not found")
         class NotFound {
             @Test
             @Tag("ApiTest")
             @Tag("IntegrationTest")
-            @DisplayName("Should return a not found status code when getting a non existing task")
-            void shouldReturnANotFoundStatusCodeWhenGettingANonExistingTask() {
+            @DisplayName("Should return a not found status code when retrieving a non existing task")
+            void shouldReturnANotFoundStatusCodeWhenRetrievingANonExistingTask() {
                 final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
 
                 given()
