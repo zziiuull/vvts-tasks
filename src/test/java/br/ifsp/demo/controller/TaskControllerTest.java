@@ -161,6 +161,59 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                         .statusCode(HttpStatus.UNAUTHORIZED.value());
             }
         }
+
+        @Nested
+        @DisplayName("PUT /api/v1/task/edit/{id}")
+        class EditTask {
+            @Nested
+            @DisplayName("200 ok")
+            class Ok {
+                @Test
+                @Tag("ApiTest")
+                @Tag("IntegrationTest")
+                @DisplayName("Should return an ok status code when editing a task")
+                void shouldReturnAnOkStatusCodeWhenEditingATask(){
+                    final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+
+                    final ResponseTaskDTO createdTaskDTO =
+                            given()
+                                    .contentType("application/json")
+                                    .port(RestAssured.port)
+                                    .body(createTaskDTO)
+                                    .header("Authorization", authorizationHeader)
+                                    .when()
+                                    .post("api/v1/task/create")
+                                    .then()
+                                    .log()
+                                    .ifValidationFails(LogDetail.BODY)
+                                    .statusCode(HttpStatus.CREATED.value())
+                                    .extract()
+                                    .as(ResponseTaskDTO.class);
+
+                    final CreateTaskDTO editTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+
+                    ResponseTaskDTO editedTaskDTO = given()
+                            .contentType("application/json")
+                            .port(RestAssured.port)
+                            .body(editTaskDTO)
+                            .when()
+                            .put("api/v1/task/edit/" + createdTaskDTO.id())
+                            .then()
+                            .log()
+                            .ifValidationFails(LogDetail.BODY)
+                            .statusCode(HttpStatus.OK.value())
+                            .extract()
+                            .as(ResponseTaskDTO.class);
+
+                    assertThat(editedTaskDTO.id()).isEqualTo(createdTaskDTO.id());
+                    assertThat(editedTaskDTO.title()).isEqualTo(editTaskDTO.title());
+                    assertThat(editedTaskDTO.description()).isEqualTo(editTaskDTO.description());
+                    assertThat(editedTaskDTO.deadline()).isEqualTo(editTaskDTO.deadline());
+                    assertThat(editedTaskDTO.estimatedTime()).isEqualTo(editTaskDTO.estimatedTime());
+                    assertThat(editedTaskDTO.suggestion()).isEqualTo(editTaskDTO.suggestion());
+                }
+            }
+        }
     }
 
     @Nested
