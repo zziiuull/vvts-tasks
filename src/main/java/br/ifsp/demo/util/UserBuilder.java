@@ -20,4 +20,15 @@ public class UserBuilder {
                 .role(Role.USER)
                 .build();
     }
+
+    public static User withEmail(String email) {
+        return User.builder()
+                .id(UUID.randomUUID())
+                .name("Test")
+                .lastname("User")
+                .email(email)
+                .password("encoded-password")
+                .role(Role.USER)
+                .build();
+    }
 }
