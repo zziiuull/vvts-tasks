@@ -551,6 +551,47 @@ class TaskControllerTest extends BaseApiIntegrationTest {
     }
 
     @Nested
+    @DisplayName("DELETE /api/v1/task/delete/{id}")
+    class DeleteTest {
+        @Nested
+        @DisplayName("204 no content")
+        class Ok {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return a no content status code when deleting a task")
+            void shouldReturnANoContentStatusCodeWhenDeletingATask() {
+                final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+
+                final ResponseTaskDTO response =
+                        given()
+                                .contentType("application/json")
+                                .port(RestAssured.port)
+                                .body(createTaskDTO)
+                                .header("Authorization", authorizationHeader)
+                                .when()
+                                .post("api/v1/task/create")
+                                .then()
+                                .log()
+                                .ifValidationFails(LogDetail.BODY)
+                                .statusCode(HttpStatus.CREATED.value())
+                                .extract()
+                                .as(ResponseTaskDTO.class);
+
+                given()
+                .port(RestAssured.port)
+                .header("Authorization", authorizationHeader)
+                .when()
+                .delete("api/v1/task/delete/" + response.id())
+                .then()
+                .log()
+                .ifValidationFails(LogDetail.BODY)
+                .statusCode(HttpStatus.NO_CONTENT.value());
+            }
+        }
+    }
+
+    @Nested
     @DisplayName("PUT /mark-completed/{id}")
     class MarkCompletedTests {
 
