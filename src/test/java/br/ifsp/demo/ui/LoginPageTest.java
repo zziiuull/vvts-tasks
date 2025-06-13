@@ -4,6 +4,8 @@ import br.ifsp.demo.ui.pages.LoginPageObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -98,9 +100,18 @@ class LoginPageTest extends BaseSeleniumTest {
         loginPage.clickLogin();
 
         Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        wait.until(web -> web.getCurrentUrl().contains("task"));
+        wait.until(web -> Objects.requireNonNull(web.getCurrentUrl()).contains("task"));
 
         assertThat(driver.getCurrentUrl()).contains("task");
+    }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should render correctly on small screen")
+    void shouldRenderCorrectlyOnSmallScreen() {
+        driver.manage().window().setSize(new Dimension(375, 667));
+
+        assertThat(driver.findElement(By.className("login-container")).isDisplayed()).isTrue();
     }
 
 }
