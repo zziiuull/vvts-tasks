@@ -22,4 +22,11 @@ public class LoginPageObject extends BasePageObject {
         driver.findElement(usernameField).clear();
         driver.findElement(usernameField).sendKeys(username);
     }
+
+    public void fillPassword(String password) {
+        driver.findElement(passwordField).clear();
+        driver.findElement(passwordField).sendKeys(password);
+    }
+
+
 }
