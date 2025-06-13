@@ -428,6 +428,25 @@ class TaskControllerTest extends BaseApiIntegrationTest {
 
             }
         }
+
+        @Nested
+        @DisplayName("401 unauthorized")
+        class Unauthorized {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return an unauthorized status code when getting all tasks user is unauthorized")
+            void shouldReturnAnUnauthorizedStatusCodeWhenGettingAllTasksAndUserIsUnauthorized() {
+                given().contentType("application/json")
+                        .port(RestAssured.port)
+                        .when()
+                        .get("api/v1/task/get-all")
+                        .then()
+                        .log()
+                        .ifValidationFails(LogDetail.BODY)
+                        .statusCode(HttpStatus.UNAUTHORIZED.value());
+            }
+        }
     }
 
     @Nested
