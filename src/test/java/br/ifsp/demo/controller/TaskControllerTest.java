@@ -591,6 +591,26 @@ class TaskControllerTest extends BaseApiIntegrationTest {
         }
 
         @Nested
+        @DisplayName("401 unauthorized")
+        class Unauthorized {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return an unauthorized status code when deleting a task and user is unauthorized")
+            void shouldReturnAnUnauthorizedStatusCodeWhenDeletingATaskAndUserIsUnauthorized() {
+                given()
+                    .contentType("application/json")
+                    .port(RestAssured.port)
+                .when()
+                    .get("api/v1/task/delete/" + UUID.randomUUID())
+                .then()
+                    .log()
+                    .ifValidationFails(LogDetail.BODY)
+                    .statusCode(HttpStatus.UNAUTHORIZED.value());
+            }
+        }
+
+        @Nested
         @DisplayName("404 not found")
         class NotFound {
             @Test
