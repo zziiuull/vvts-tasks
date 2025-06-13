@@ -589,6 +589,30 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                 .statusCode(HttpStatus.NO_CONTENT.value());
             }
         }
+
+        @Nested
+        @DisplayName("404 not found")
+        class NotFound {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return a not found status code when deleting a non existing task")
+            void shouldReturnANotFoundStatusCodeWhenDeletingANonExistingTask() {
+                final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+
+                given()
+                    .contentType("application/json")
+                    .port(RestAssured.port)
+                    .body(createTaskDTO)
+                    .header("Authorization", authorizationHeader)
+                .when()
+                    .delete("api/v1/task/delete/" + UUID.randomUUID())
+                .then()
+                    .log()
+                    .ifValidationFails(LogDetail.BODY)
+                    .statusCode(HttpStatus.NOT_FOUND.value());
+            }
+        }
     }
 
     @Nested
