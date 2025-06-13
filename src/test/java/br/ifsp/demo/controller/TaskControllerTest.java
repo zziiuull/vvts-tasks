@@ -524,6 +524,30 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                     .statusCode(HttpStatus.UNAUTHORIZED.value());
             }
         }
+        
+        @Nested
+        @DisplayName("404 not found")
+        class NotFound {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return a not found status code when getting a non existing task")
+            void shouldReturnANotFoundStatusCodeWhenGettingANonExistingTask() {
+                final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+
+                given()
+                        .contentType("application/json")
+                        .port(RestAssured.port)
+                        .body(createTaskDTO)
+                        .header("Authorization", authorizationHeader)
+                        .when()
+                        .get("api/v1/task/get/" + UUID.randomUUID())
+                        .then()
+                        .log()
+                        .ifValidationFails(LogDetail.BODY)
+                        .statusCode(HttpStatus.NOT_FOUND.value());
+            }
+        }
     }
 
     @Nested
