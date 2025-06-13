@@ -450,6 +450,63 @@ class TaskControllerTest extends BaseApiIntegrationTest {
     }
 
     @Nested
+    @DisplayName("GET /api/v1/task/get/{id}")
+    class GetTask {
+        @Nested
+        @DisplayName("200 ok")
+        class Ok {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return an ok status code when getting a task")
+            void shouldReturnAnOkStatusCodeWhenGettingATask(){
+                final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+
+                final ResponseTaskDTO response =
+                    given()
+                        .contentType("application/json")
+                        .port(RestAssured.port)
+                        .body(createTaskDTO)
+                        .header("Authorization", authorizationHeader)
+                    .when()
+                        .post("api/v1/task/create")
+                    .then()
+                        .log()
+                        .ifValidationFails(LogDetail.BODY)
+                        .statusCode(HttpStatus.CREATED.value())
+                        .extract()
+                        .as(ResponseTaskDTO.class);
+
+                final ResponseTaskDTO found =
+                    given()
+                        .port(RestAssured.port)
+                        .header("Authorization", authorizationHeader)
+                    .when()
+                        .get("api/v1/task/get/" + response.id())
+                    .then()
+                        .log()
+                        .ifValidationFails(LogDetail.BODY)
+                        .statusCode(HttpStatus.OK.value())
+                        .extract()
+                        .as(ResponseTaskDTO.class);
+
+                assertThat(found.id()).isEqualTo(response.id());
+                assertThat(found.title()).isEqualTo(response.title());
+                assertThat(found.description()).isEqualTo(response.description());
+                assertThat(found.deadline()).isEqualTo(response.deadline());
+                assertThat(found.status()).isEqualTo(response.status());
+                assertThat(found.startTime()).isEqualTo(response.startTime());
+                assertThat(found.finishTime()).isEqualTo(response.finishTime());
+                assertThat(found.timeSpent()).isEqualTo(response.timeSpent());
+                assertThat(found.estimatedTime()).isEqualTo(createTaskDTO.estimatedTime());
+//                assertThat(found.suggestion()).isEqualTo(createTaskDTO.suggestion());
+                assertThat(found.suggestion()).isNull();
+                assertThat(found.userId()).isEqualTo(user.getId());
+            }
+        }
+    }
+
+    @Nested
     @DisplayName("PUT /mark-completed/{id}")
     class MarkCompletedTests {
 
