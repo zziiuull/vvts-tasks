@@ -90,6 +90,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
         class BadRequest {
             @Test
             @Tag("ApiTest")
+            @Tag("IntegrationTest")
             @DisplayName("Should return a bad request status code when createTaskDTO title is blank")
             void shouldReturnABadRequestStatusCodeWhenCreateTaskDTOTitleIsBlank() {
                 final CreateTaskDTO invalidCreateTaskDTO = new CreateTaskDTO(
@@ -115,6 +116,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
 
             @Test
             @Tag("ApiTest")
+            @Tag("IntegrationTest")
             @DisplayName("Should return a bad request status code when createTaskDTO deadline is in past")
             void shouldReturnABadRequestStatusCodeWhenCreateTaskDTODeadlineIsInPast() {
                 final CreateTaskDTO invalidCreateTaskDTO = new CreateTaskDTO(
@@ -143,6 +145,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
         class Unauthorized {
             @Test
             @Tag("ApiTest")
+            @Tag("IntegrationTest")
             @DisplayName("Should return an unauthorized status code when user is unauthorized")
             void shouldReturnAnUnauthorizedStatusCodeWhenUserIsUnauthorized() {
                 final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
