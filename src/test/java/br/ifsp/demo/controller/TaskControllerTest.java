@@ -22,6 +22,19 @@ class TaskControllerTest extends BaseApiIntegrationTest {
     @Autowired
     private JpaTaskRepository taskRepository;
 
+    String password;
+    User user;
+    String token;
+    String authorizationHeader;
+
+    @BeforeEach
+    void setUp() {
+        password = "user123";
+        user = registerUser(password);
+        token = authenticate(user.getEmail(), password);
+        authorizationHeader = "Bearer " + token;
+    }
+
     @AfterEach
     public void tearDown(){
         taskRepository.deleteAll();
@@ -38,16 +51,13 @@ class TaskControllerTest extends BaseApiIntegrationTest {
             @Tag("IntegrationTest")
             @DisplayName("Should create a task")
             void shouldCreateATask() {
-                String password = "user123";
-                User user = registerUser(password);
                 final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
-                final String token = authenticate(user.getEmail(), password);
 
                 final ResponseTaskDTO response =
                         given().contentType("application/json")
                                 .port(RestAssured.port)
                                 .body(createTaskDTO)
-                                .header("Authorization", "Bearer " + token)
+                                .header("Authorization", authorizationHeader)
                                 .when()
                                 .post("api/v1/task/create")
                                 .then()
@@ -82,9 +92,6 @@ class TaskControllerTest extends BaseApiIntegrationTest {
             @Tag("ApiTest")
             @DisplayName("Should return a bad request status code when createTaskDTO title is blank")
             void shouldReturnABadRequestStatusCodeWhenCreateTaskDTOTitleIsBlank() {
-                String password = "user123";
-                User user = registerUser(password);
-                final String token = authenticate(user.getEmail(), password);
                 final CreateTaskDTO invalidCreateTaskDTO = new CreateTaskDTO(
                         "",
                         "Descrição",
@@ -97,7 +104,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                 given().contentType("application/json")
                         .port(RestAssured.port)
                         .body(invalidCreateTaskDTO)
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", authorizationHeader)
                         .when()
                         .post("api/v1/task/create")
                         .then()
@@ -110,9 +117,6 @@ class TaskControllerTest extends BaseApiIntegrationTest {
             @Tag("ApiTest")
             @DisplayName("Should return a bad request status code when createTaskDTO deadline is in past")
             void shouldReturnABadRequestStatusCodeWhenCreateTaskDTODeadlineIsInPast() {
-                String password = "user123";
-                User user = registerUser(password);
-                final String token = authenticate(user.getEmail(), password);
                 final CreateTaskDTO invalidCreateTaskDTO = new CreateTaskDTO(
                         "Title",
                         "Descrição",
@@ -124,7 +128,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                 given().contentType("application/json")
                         .port(RestAssured.port)
                         .body(invalidCreateTaskDTO)
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", authorizationHeader)
                         .when()
                         .post("api/v1/task/create")
                         .then()
@@ -165,16 +169,11 @@ class TaskControllerTest extends BaseApiIntegrationTest {
         @Tag("IntegrationTest")
         @DisplayName("Should mark a task as completed and return 204")
         void shouldMarkATaskAsCompletedAndReturn204() {
-
-            String password = "abc123";
-            User user = registerUser(password);
-            String token = authenticate(user.getEmail(), password);
-
             CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
 
             final ResponseTaskDTO response =
                     given().contentType("application/json")
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", authorizationHeader)
                         .body(createTaskDTO)
                     .when()
                         .post("/api/v1/task/create")
@@ -183,7 +182,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                         .extract()
                         .as(ResponseTaskDTO.class);
 
-            given().header("Authorization", "Bearer " + token)
+            given().header("Authorization", authorizationHeader)
                 .when()
                 .put("/api/v1/task/mark-completed/" + response.id())
                 .then()
@@ -198,13 +197,9 @@ class TaskControllerTest extends BaseApiIntegrationTest {
         @Tag("IntegrationTest")
         @DisplayName("Should return 404 if task does not exist")
         void shouldReturn404IfTaskDoesNotExist() {
-            String password = "pass123";
-            User user = registerUser(password);
-            String token = authenticate(user.getEmail(), password);
-
             UUID randomId = UUID.randomUUID();
 
-            given().header("Authorization", "Bearer " + token)
+            given().header("Authorization", authorizationHeader)
                 .when()
                 .put("/api/v1/task/mark-completed/" + randomId)
                 .then()
@@ -248,20 +243,17 @@ class TaskControllerTest extends BaseApiIntegrationTest {
         @Tag("IntegrationTest")
         @DisplayName("Should clock-in task and return 204")
         void shouldClockInTaskAndReturn204() {
-            String password = "abc123";
-            User user = registerUser(password);
-            String token = authenticate(user.getEmail(), password);
             CreateTaskDTO dto = EntityBuilder.createRandomCreateTaskDTO();
 
             ResponseTaskDTO createdTask =
                 given().contentType("application/json")
-                    .header("Authorization", "Bearer " + token)
+                    .header("Authorization", authorizationHeader)
                     .body(dto)
                 .when().post("/api/v1/task/create")
                 .then().statusCode(HttpStatus.CREATED.value())
                 .extract().as(ResponseTaskDTO.class);
 
-            given().header("Authorization", "Bearer " + token)
+            given().header("Authorization", authorizationHeader)
                 .when().put("/api/v1/task/clock-in/" + createdTask.id())
                 .then().statusCode(HttpStatus.NO_CONTENT.value());
 
@@ -274,13 +266,9 @@ class TaskControllerTest extends BaseApiIntegrationTest {
         @Tag("IntegrationTest")
         @DisplayName("Should return 404 when task does not exist")
         void shouldReturn404WhenTaskDoesNotExist() {
-            String password = "pass123";
-            User user = registerUser(password);
-            String token = authenticate(user.getEmail(), password);
-
             UUID nonExistentId = UUID.randomUUID();
 
-            given().header("Authorization", "Bearer " + token)
+            given().header("Authorization", authorizationHeader)
                 .when().put("/api/v1/task/clock-in/" + nonExistentId)
                 .then().statusCode(HttpStatus.NOT_FOUND.value());
         }
@@ -319,24 +307,20 @@ class TaskControllerTest extends BaseApiIntegrationTest {
         @Tag("IntegrationTest")
         @DisplayName("Should clock-out task and return 204")
         void shouldClockOutTaskAndReturn204() {
-            String password = "abc123";
-            User user = registerUser(password);
-            String token = authenticate(user.getEmail(), password);
-
             CreateTaskDTO dto = EntityBuilder.createRandomCreateTaskDTO();
             ResponseTaskDTO createdTask =
                 given().contentType("application/json")
-                    .header("Authorization", "Bearer " + token)
+                    .header("Authorization", authorizationHeader)
                     .body(dto)
                 .when().post("/api/v1/task/create")
                 .then().statusCode(HttpStatus.CREATED.value())
                 .extract().as(ResponseTaskDTO.class);
 
-            given().header("Authorization", "Bearer " + token)
+            given().header("Authorization", authorizationHeader)
                 .when().put("/api/v1/task/clock-in/" + createdTask.id())
                 .then().statusCode(HttpStatus.NO_CONTENT.value());
 
-            given().header("Authorization", "Bearer " + token)
+            given().header("Authorization", authorizationHeader)
                 .when().put("/api/v1/task/clock-out/" + createdTask.id())
                 .then().statusCode(HttpStatus.NO_CONTENT.value());
 
@@ -349,13 +333,9 @@ class TaskControllerTest extends BaseApiIntegrationTest {
         @Tag("IntegrationTest")
         @DisplayName("Should return 404 if task not found")
         void shouldReturn404IfTaskNotFound() {
-            String password = "pass123";
-            User user = registerUser(password);
-            String token = authenticate(user.getEmail(), password);
-
             UUID fakeId = UUID.randomUUID();
 
-            given().header("Authorization", "Bearer " + token)
+            given().header("Authorization", authorizationHeader)
                 .when().put("/api/v1/task/clock-out/" + fakeId)
                 .then().statusCode(HttpStatus.NOT_FOUND.value());
         }
@@ -397,30 +377,25 @@ class TaskControllerTest extends BaseApiIntegrationTest {
         @Tag("IntegrationTest")
         @DisplayName("Should return spent time of task with 200")
         void shouldReturnSpentTimeOfTaskWith200() {
-
-            String password = "abc123";
-            User user = registerUser(password);
-            String token = authenticate(user.getEmail(), password);
-
             CreateTaskDTO dto = EntityBuilder.createRandomCreateTaskDTO();
             ResponseTaskDTO createdTask =
                 given().contentType("application/json")
-                    .header("Authorization", "Bearer " + token)
+                    .header("Authorization", authorizationHeader)
                     .body(dto)
                     .when().post("/api/v1/task/create")
                     .then().statusCode(HttpStatus.CREATED.value())
                     .extract().as(ResponseTaskDTO.class);
 
-            given().header("Authorization", "Bearer " + token)
+            given().header("Authorization", authorizationHeader)
                 .when().put("/api/v1/task/clock-in/" + createdTask.id())
                 .then().statusCode(HttpStatus.NO_CONTENT.value());
 
-            given().header("Authorization", "Bearer " + token)
+            given().header("Authorization", authorizationHeader)
                     .when().put("/api/v1/task/clock-out/" + createdTask.id())
                     .then().statusCode(HttpStatus.NO_CONTENT.value());
 
             final Integer timeSpent =
-                    given().header("Authorization", "Bearer " + token)
+                    given().header("Authorization", authorizationHeader)
                             .when().get("/api/v1/task/spent-time/" + createdTask.id())
                             .then()
                             .statusCode(HttpStatus.OK.value())
@@ -436,13 +411,9 @@ class TaskControllerTest extends BaseApiIntegrationTest {
         @Tag("IntegrationTest")
         @DisplayName("Should return not found if task does not exist")
         void shouldReturnNotFoundIfTaskDoesNotExist() {
-            String password = "userpass";
-            User user = registerUser(password);
-            String token = authenticate(user.getEmail(), password);
-
             UUID invalidId = UUID.randomUUID();
 
-            given().header("Authorization", "Bearer " + token)
+            given().header("Authorization", authorizationHeader)
                     .when().get("/api/v1/task/spent-time/" + invalidId)
                     .then().statusCode(HttpStatus.NOT_FOUND.value());
         }
