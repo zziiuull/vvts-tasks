@@ -1,5 +1,7 @@
-package br.ifsp.demo.security.user;
+package br.ifsp.demo.repository;
 
+import br.ifsp.demo.security.user.JpaUserRepository;
+import br.ifsp.demo.security.user.User;
 import br.ifsp.demo.util.UserBuilder;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
