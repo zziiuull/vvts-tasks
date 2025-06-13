@@ -213,6 +213,94 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                     assertThat(editedTaskDTO.suggestion()).isEqualTo(editTaskDTO.suggestion());
                 }
             }
+
+            @Nested
+            @DisplayName("400 bad request")
+            class BadRequest {
+                @Test
+                @Tag("ApiTest")
+                @Tag("IntegrationTest")
+                @DisplayName("Should return a bad request status code when editing a task and title is blank")
+                void shouldReturnABadRequestStatusCodeWhenEditingATaskAndTitleIsBlank() {
+                    final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+
+                    final ResponseTaskDTO response =
+                            given().contentType("application/json")
+                                    .port(RestAssured.port)
+                                    .body(createTaskDTO)
+                                    .header("Authorization", authorizationHeader)
+                                    .when()
+                                    .post("api/v1/task/create")
+                                    .then()
+                                    .log()
+                                    .ifValidationFails(LogDetail.BODY)
+                                    .statusCode(HttpStatus.CREATED.value())
+                                    .extract()
+                                    .as(ResponseTaskDTO.class);
+
+                    final CreateTaskDTO invalidCreateTaskDTO = new CreateTaskDTO(
+                            "",
+                            "Descrição",
+                            LocalDateTime.now().plusMinutes(10),
+                            10L,
+                            "Sugestão"
+                    );
+
+                    given()
+                            .contentType("application/json")
+                            .port(RestAssured.port)
+                            .body(invalidCreateTaskDTO)
+                            .header("Authorization", authorizationHeader)
+                            .when()
+                            .put("api/v1/task/edit/" + response.id())
+                            .then()
+                            .log()
+                            .ifValidationFails(LogDetail.BODY)
+                            .statusCode(HttpStatus.BAD_REQUEST.value());
+                }
+
+                @Test
+                @Tag("ApiTest")
+                @Tag("IntegrationTest")
+                @DisplayName("Should return a bad request status code when editing a task and deadline is in past")
+                void shouldReturnABadRequestStatusCodeWhenEditingATaskAndDeadlineIsInPast() {
+                    final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+
+                    final ResponseTaskDTO response =
+                            given().contentType("application/json")
+                                    .port(RestAssured.port)
+                                    .body(createTaskDTO)
+                                    .header("Authorization", authorizationHeader)
+                                    .when()
+                                    .post("api/v1/task/create")
+                                    .then()
+                                    .log()
+                                    .ifValidationFails(LogDetail.BODY)
+                                    .statusCode(HttpStatus.CREATED.value())
+                                    .extract()
+                                    .as(ResponseTaskDTO.class);
+
+                    final CreateTaskDTO invalidCreateTaskDTO = new CreateTaskDTO(
+                            "Título",
+                            "Descrição",
+                            LocalDateTime.now().minusMinutes(10),
+                            10L,
+                            "Sugestão"
+                    );
+
+                    given()
+                            .contentType("application/json")
+                            .port(RestAssured.port)
+                            .body(invalidCreateTaskDTO)
+                            .header("Authorization", authorizationHeader)
+                            .when()
+                            .put("api/v1/task/edit/" + response.id())
+                            .then()
+                            .log()
+                            .ifValidationFails(LogDetail.BODY)
+                            .statusCode(HttpStatus.BAD_REQUEST.value());
+                }
+            }
         }
     }
 
