@@ -60,4 +60,19 @@ class LoginPageTest extends BaseSeleniumTest {
         String error = loginPage.waitForErrorMessage();
         assertThat(error).contains("invalid username");
     }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should show error for empty password")
+    void shouldShowErrorForEmptyPassword() {
+        loginPage.fillUsername("user@email.com");
+        loginPage.fillPassword("");
+        loginPage.clickLogin();
+
+        String error = loginPage.waitForErrorMessage();
+        assertThat(error).contains("password");
+    }
+
+
+
 }
