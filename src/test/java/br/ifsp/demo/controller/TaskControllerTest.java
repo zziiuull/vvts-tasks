@@ -161,207 +161,207 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                         .statusCode(HttpStatus.UNAUTHORIZED.value());
             }
         }
+    }
+
+    @Nested
+    @DisplayName("PUT /api/v1/task/edit/{id}")
+    class EditTask {
+        @Nested
+        @DisplayName("200 ok")
+        class Ok {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return an ok status code when editing a task")
+            void shouldReturnAnOkStatusCodeWhenEditingATask(){
+                final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+
+                final ResponseTaskDTO createdTaskDTO =
+                        given()
+                                .contentType("application/json")
+                                .port(RestAssured.port)
+                                .body(createTaskDTO)
+                                .header("Authorization", authorizationHeader)
+                                .when()
+                                .post("api/v1/task/create")
+                                .then()
+                                .log()
+                                .ifValidationFails(LogDetail.BODY)
+                                .statusCode(HttpStatus.CREATED.value())
+                                .extract()
+                                .as(ResponseTaskDTO.class);
+
+                final CreateTaskDTO editTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+
+                ResponseTaskDTO editedTaskDTO = given()
+                        .contentType("application/json")
+                        .port(RestAssured.port)
+                        .body(editTaskDTO)
+                        .when()
+                        .put("api/v1/task/edit/" + createdTaskDTO.id())
+                        .then()
+                        .log()
+                        .ifValidationFails(LogDetail.BODY)
+                        .statusCode(HttpStatus.OK.value())
+                        .extract()
+                        .as(ResponseTaskDTO.class);
+
+                assertThat(editedTaskDTO.id()).isEqualTo(createdTaskDTO.id());
+                assertThat(editedTaskDTO.title()).isEqualTo(editTaskDTO.title());
+                assertThat(editedTaskDTO.description()).isEqualTo(editTaskDTO.description());
+                assertThat(editedTaskDTO.deadline()).isEqualTo(editTaskDTO.deadline());
+                assertThat(editedTaskDTO.estimatedTime()).isEqualTo(editTaskDTO.estimatedTime());
+                assertThat(editedTaskDTO.suggestion()).isEqualTo(editTaskDTO.suggestion());
+            }
+        }
 
         @Nested
-        @DisplayName("PUT /api/v1/task/edit/{id}")
-        class EditTask {
-            @Nested
-            @DisplayName("200 ok")
-            class Ok {
-                @Test
-                @Tag("ApiTest")
-                @Tag("IntegrationTest")
-                @DisplayName("Should return an ok status code when editing a task")
-                void shouldReturnAnOkStatusCodeWhenEditingATask(){
-                    final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+        @DisplayName("400 bad request")
+        class BadRequest {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return a bad request status code when editing a task and title is blank")
+            void shouldReturnABadRequestStatusCodeWhenEditingATaskAndTitleIsBlank() {
+                final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
 
-                    final ResponseTaskDTO createdTaskDTO =
-                            given()
-                                    .contentType("application/json")
-                                    .port(RestAssured.port)
-                                    .body(createTaskDTO)
-                                    .header("Authorization", authorizationHeader)
-                                    .when()
-                                    .post("api/v1/task/create")
-                                    .then()
-                                    .log()
-                                    .ifValidationFails(LogDetail.BODY)
-                                    .statusCode(HttpStatus.CREATED.value())
-                                    .extract()
-                                    .as(ResponseTaskDTO.class);
+                final ResponseTaskDTO response =
+                        given().contentType("application/json")
+                                .port(RestAssured.port)
+                                .body(createTaskDTO)
+                                .header("Authorization", authorizationHeader)
+                                .when()
+                                .post("api/v1/task/create")
+                                .then()
+                                .log()
+                                .ifValidationFails(LogDetail.BODY)
+                                .statusCode(HttpStatus.CREATED.value())
+                                .extract()
+                                .as(ResponseTaskDTO.class);
 
-                    final CreateTaskDTO editTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+                final CreateTaskDTO invalidCreateTaskDTO = new CreateTaskDTO(
+                        "",
+                        "Descrição",
+                        LocalDateTime.now().plusMinutes(10),
+                        10L,
+                        "Sugestão"
+                );
 
-                    ResponseTaskDTO editedTaskDTO = given()
-                            .contentType("application/json")
-                            .port(RestAssured.port)
-                            .body(editTaskDTO)
-                            .when()
-                            .put("api/v1/task/edit/" + createdTaskDTO.id())
-                            .then()
-                            .log()
-                            .ifValidationFails(LogDetail.BODY)
-                            .statusCode(HttpStatus.OK.value())
-                            .extract()
-                            .as(ResponseTaskDTO.class);
-
-                    assertThat(editedTaskDTO.id()).isEqualTo(createdTaskDTO.id());
-                    assertThat(editedTaskDTO.title()).isEqualTo(editTaskDTO.title());
-                    assertThat(editedTaskDTO.description()).isEqualTo(editTaskDTO.description());
-                    assertThat(editedTaskDTO.deadline()).isEqualTo(editTaskDTO.deadline());
-                    assertThat(editedTaskDTO.estimatedTime()).isEqualTo(editTaskDTO.estimatedTime());
-                    assertThat(editedTaskDTO.suggestion()).isEqualTo(editTaskDTO.suggestion());
-                }
+                given()
+                        .contentType("application/json")
+                        .port(RestAssured.port)
+                        .body(invalidCreateTaskDTO)
+                        .header("Authorization", authorizationHeader)
+                        .when()
+                        .put("api/v1/task/edit/" + response.id())
+                        .then()
+                        .log()
+                        .ifValidationFails(LogDetail.BODY)
+                        .statusCode(HttpStatus.BAD_REQUEST.value());
             }
 
-            @Nested
-            @DisplayName("400 bad request")
-            class BadRequest {
-                @Test
-                @Tag("ApiTest")
-                @Tag("IntegrationTest")
-                @DisplayName("Should return a bad request status code when editing a task and title is blank")
-                void shouldReturnABadRequestStatusCodeWhenEditingATaskAndTitleIsBlank() {
-                    final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return a bad request status code when editing a task and deadline is in past")
+            void shouldReturnABadRequestStatusCodeWhenEditingATaskAndDeadlineIsInPast() {
+                final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
 
-                    final ResponseTaskDTO response =
-                            given().contentType("application/json")
-                                    .port(RestAssured.port)
-                                    .body(createTaskDTO)
-                                    .header("Authorization", authorizationHeader)
-                                    .when()
-                                    .post("api/v1/task/create")
-                                    .then()
-                                    .log()
-                                    .ifValidationFails(LogDetail.BODY)
-                                    .statusCode(HttpStatus.CREATED.value())
-                                    .extract()
-                                    .as(ResponseTaskDTO.class);
+                final ResponseTaskDTO response =
+                        given().contentType("application/json")
+                                .port(RestAssured.port)
+                                .body(createTaskDTO)
+                                .header("Authorization", authorizationHeader)
+                                .when()
+                                .post("api/v1/task/create")
+                                .then()
+                                .log()
+                                .ifValidationFails(LogDetail.BODY)
+                                .statusCode(HttpStatus.CREATED.value())
+                                .extract()
+                                .as(ResponseTaskDTO.class);
 
-                    final CreateTaskDTO invalidCreateTaskDTO = new CreateTaskDTO(
-                            "",
-                            "Descrição",
-                            LocalDateTime.now().plusMinutes(10),
-                            10L,
-                            "Sugestão"
-                    );
+                final CreateTaskDTO invalidCreateTaskDTO = new CreateTaskDTO(
+                        "Título",
+                        "Descrição",
+                        LocalDateTime.now().minusMinutes(10),
+                        10L,
+                        "Sugestão"
+                );
 
-                    given()
-                            .contentType("application/json")
-                            .port(RestAssured.port)
-                            .body(invalidCreateTaskDTO)
-                            .header("Authorization", authorizationHeader)
-                            .when()
-                            .put("api/v1/task/edit/" + response.id())
-                            .then()
-                            .log()
-                            .ifValidationFails(LogDetail.BODY)
-                            .statusCode(HttpStatus.BAD_REQUEST.value());
-                }
-
-                @Test
-                @Tag("ApiTest")
-                @Tag("IntegrationTest")
-                @DisplayName("Should return a bad request status code when editing a task and deadline is in past")
-                void shouldReturnABadRequestStatusCodeWhenEditingATaskAndDeadlineIsInPast() {
-                    final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
-
-                    final ResponseTaskDTO response =
-                            given().contentType("application/json")
-                                    .port(RestAssured.port)
-                                    .body(createTaskDTO)
-                                    .header("Authorization", authorizationHeader)
-                                    .when()
-                                    .post("api/v1/task/create")
-                                    .then()
-                                    .log()
-                                    .ifValidationFails(LogDetail.BODY)
-                                    .statusCode(HttpStatus.CREATED.value())
-                                    .extract()
-                                    .as(ResponseTaskDTO.class);
-
-                    final CreateTaskDTO invalidCreateTaskDTO = new CreateTaskDTO(
-                            "Título",
-                            "Descrição",
-                            LocalDateTime.now().minusMinutes(10),
-                            10L,
-                            "Sugestão"
-                    );
-
-                    given()
-                            .contentType("application/json")
-                            .port(RestAssured.port)
-                            .body(invalidCreateTaskDTO)
-                            .header("Authorization", authorizationHeader)
-                            .when()
-                            .put("api/v1/task/edit/" + response.id())
-                            .then()
-                            .log()
-                            .ifValidationFails(LogDetail.BODY)
-                            .statusCode(HttpStatus.BAD_REQUEST.value());
-                }
+                given()
+                        .contentType("application/json")
+                        .port(RestAssured.port)
+                        .body(invalidCreateTaskDTO)
+                        .header("Authorization", authorizationHeader)
+                        .when()
+                        .put("api/v1/task/edit/" + response.id())
+                        .then()
+                        .log()
+                        .ifValidationFails(LogDetail.BODY)
+                        .statusCode(HttpStatus.BAD_REQUEST.value());
             }
+        }
 
-            @Nested
-            @DisplayName("401 unauthorized")
-            class Unauthorized {
-                @Test
-                @Tag("ApiTest")
-                @Tag("IntegrationTest")
-                @DisplayName("Should return an unauthorized status code when editing a task and user is unauthorized")
-                void shouldReturnAnUnauthorizedStatusCodeWhenEditingATaskAndUserIsUnauthorized() {
-                    final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+        @Nested
+        @DisplayName("401 unauthorized")
+        class Unauthorized {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return an unauthorized status code when editing a task and user is unauthorized")
+            void shouldReturnAnUnauthorizedStatusCodeWhenEditingATaskAndUserIsUnauthorized() {
+                final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
 
-                    final ResponseTaskDTO response =
-                            given().contentType("application/json")
-                                    .port(RestAssured.port)
-                                    .body(createTaskDTO)
-                                    .header("Authorization", authorizationHeader)
-                                    .when()
-                                    .post("api/v1/task/create")
-                                    .then()
-                                    .log()
-                                    .ifValidationFails(LogDetail.BODY)
-                                    .statusCode(HttpStatus.CREATED.value())
-                                    .extract()
-                                    .as(ResponseTaskDTO.class);
+                final ResponseTaskDTO response =
+                        given().contentType("application/json")
+                                .port(RestAssured.port)
+                                .body(createTaskDTO)
+                                .header("Authorization", authorizationHeader)
+                                .when()
+                                .post("api/v1/task/create")
+                                .then()
+                                .log()
+                                .ifValidationFails(LogDetail.BODY)
+                                .statusCode(HttpStatus.CREATED.value())
+                                .extract()
+                                .as(ResponseTaskDTO.class);
 
-                    final CreateTaskDTO editTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+                final CreateTaskDTO editTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
 
-                    given().contentType("application/json")
-                            .port(RestAssured.port)
-                            .body(editTaskDTO)
-                            .when()
-                            .put("api/v1/task/edit")
-                            .then()
-                            .log()
-                            .ifValidationFails(LogDetail.BODY)
-                            .statusCode(HttpStatus.UNAUTHORIZED.value());
-                }
+                given().contentType("application/json")
+                        .port(RestAssured.port)
+                        .body(editTaskDTO)
+                        .when()
+                        .put("api/v1/task/edit")
+                        .then()
+                        .log()
+                        .ifValidationFails(LogDetail.BODY)
+                        .statusCode(HttpStatus.UNAUTHORIZED.value());
             }
+        }
 
-            @Nested
-            @DisplayName("404 not found")
-            class NotFound {
-                @Test
-                @Tag("ApiTest")
-                @Tag("IntegrationTest")
-                @DisplayName("Should return a not found status code when editing a non existing task")
-                void shouldReturnABadRequestStatusCodeWhenEditingANonExistingTask() {
-                    final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+        @Nested
+        @DisplayName("404 not found")
+        class NotFound {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return a not found status code when editing a non existing task")
+            void shouldReturnABadRequestStatusCodeWhenEditingANonExistingTask() {
+                final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
 
-                    given()
-                            .contentType("application/json")
-                            .port(RestAssured.port)
-                            .body(createTaskDTO)
-                            .header("Authorization", authorizationHeader)
-                            .when()
-                            .put("api/v1/task/edit/" + UUID.randomUUID())
-                            .then()
-                            .log()
-                            .ifValidationFails(LogDetail.BODY)
-                            .statusCode(HttpStatus.NOT_FOUND.value());
-                }
+                given()
+                        .contentType("application/json")
+                        .port(RestAssured.port)
+                        .body(createTaskDTO)
+                        .header("Authorization", authorizationHeader)
+                        .when()
+                        .put("api/v1/task/edit/" + UUID.randomUUID())
+                        .then()
+                        .log()
+                        .ifValidationFails(LogDetail.BODY)
+                        .statusCode(HttpStatus.NOT_FOUND.value());
             }
         }
     }
