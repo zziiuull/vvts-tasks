@@ -6,6 +6,7 @@ import br.ifsp.demo.tasks.TaskEntity;
 import br.ifsp.demo.tasks.dtos.CreateTaskDTO;
 import br.ifsp.demo.tasks.dtos.ResponseTaskDTO;
 import io.restassured.RestAssured;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.filter.log.LogDetail;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +81,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                 assertThat(found.getFinishTime()).isEqualTo(response.finishTime());
                 assertThat(found.getTimeSpent()).isEqualTo(response.timeSpent());
                 assertThat(found.getEstimatedTime()).isEqualTo(createTaskDTO.estimatedTime());
-                assertThat(found.getSuggestion()).isNull();
+                assertThat(found.getSuggestion()).isEqualTo(createTaskDTO.suggestion());
                 assertThat(found.getUserId()).isEqualTo(user.getId());
             }
         }
@@ -362,6 +363,69 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                         .log()
                         .ifValidationFails(LogDetail.BODY)
                         .statusCode(HttpStatus.NOT_FOUND.value());
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /api/v1/task/get-all")
+    class GetAllTask {
+        @Nested
+        @DisplayName("200 ok")
+        class Ok {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return an ok status code when getting all tasks")
+            void shouldReturnAnOkStatusCodeWhenGettingAllTasks(){
+                final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+
+                final ResponseTaskDTO response =
+                    given()
+                        .contentType("application/json")
+                        .port(RestAssured.port)
+                        .body(createTaskDTO)
+                        .header("Authorization", authorizationHeader)
+                    .when()
+                        .post("api/v1/task/create")
+                    .then()
+                        .log()
+                        .ifValidationFails(LogDetail.BODY)
+                        .statusCode(HttpStatus.CREATED.value())
+                        .extract()
+                        .as(ResponseTaskDTO.class);
+
+                final List<ResponseTaskDTO> allTasks =
+                    given()
+                        .port(RestAssured.port)
+                        .header("Authorization", authorizationHeader)
+                    .when()
+                        .get("api/v1/task/get-all")
+                    .then()
+                        .log()
+                        .ifValidationFails(LogDetail.BODY)
+                        .statusCode(HttpStatus.OK.value())
+                        .extract()
+                        .as(new TypeRef<>() {
+                        });
+
+                assertThat(allTasks).hasSize(1);
+
+                ResponseTaskDTO found = allTasks.getFirst();
+
+                assertThat(found.id()).isEqualTo(response.id());
+                assertThat(found.title()).isEqualTo(response.title());
+                assertThat(found.description()).isEqualTo(response.description());
+                assertThat(found.deadline()).isEqualTo(response.deadline());
+                assertThat(found.status()).isEqualTo(response.status());
+                assertThat(found.startTime()).isEqualTo(response.startTime());
+                assertThat(found.finishTime()).isEqualTo(response.finishTime());
+                assertThat(found.timeSpent()).isEqualTo(response.timeSpent());
+                assertThat(found.estimatedTime()).isEqualTo(createTaskDTO.estimatedTime());
+//                assertThat(found.suggestion()).isEqualTo(createTaskDTO.suggestion());
+                assertThat(found.suggestion()).isNull();
+                assertThat(found.userId()).isEqualTo(user.getId());
+
             }
         }
     }
