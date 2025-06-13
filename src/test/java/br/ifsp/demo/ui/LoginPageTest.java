@@ -31,6 +31,7 @@ class LoginPageTest extends BaseSeleniumTest {
         loginPage.clickLogin();
         String error = loginPage.waitForErrorMessage();
         assertThat(error).isNotBlank();
+        assertThat(error).contains("required");
     }
 
     @Test
@@ -46,5 +47,17 @@ class LoginPageTest extends BaseSeleniumTest {
 
         wait.until(webDriver -> Objects.requireNonNull(webDriver.getTitle()).equalsIgnoreCase("Register"));
         assertThat(driver.getTitle()).isEqualTo("Register");
+    }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should show error for invalid username")
+    void shouldShowErrorForInvalidUsername() {
+        loginPage.fillUsername("a");
+        loginPage.fillPassword("validPass123");
+        loginPage.clickLogin();
+
+        String error = loginPage.waitForErrorMessage();
+        assertThat(error).contains("invalid username");
     }
 }
