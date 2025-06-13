@@ -13,7 +13,6 @@ public class TaskBuilder {
 
     public static TaskEntity defaultTask(UUID userId) {
         return TaskEntity.builder()
-                .id(UUID.randomUUID())
                 .title("Estudar VVTS")
                 .description("Revisar conteúdo de teste")
                 .deadline(LocalDateTime.now().plusDays(3))
@@ -24,7 +23,6 @@ public class TaskBuilder {
 
     public static TaskEntity randomTask(UUID userId) {
         return TaskEntity.builder()
-                .id(UUID.randomUUID())
                 .title(faker.lorem().sentence(3))
                 .description(faker.lorem().paragraph())
                 .deadline(LocalDateTime.now().plusDays(faker.number().numberBetween(1, 10)))
@@ -35,7 +33,6 @@ public class TaskBuilder {
 
     public static TaskEntity completedTask(UUID userId) {
         return TaskEntity.builder()
-                .id(UUID.randomUUID())
                 .title("Finalizado")
                 .status(TaskStatus.COMPLETED)
                 .deadline(LocalDateTime.now())
