@@ -349,7 +349,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
             @Tag("ApiTest")
             @Tag("IntegrationTest")
             @DisplayName("Should return a not found status code when editing a non existing task")
-            void shouldReturnABadRequestStatusCodeWhenEditingANonExistingTask() {
+            void shouldReturnANotFoundStatusCodeWhenEditingANonExistingTask() {
                 final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
 
                 given()
@@ -502,6 +502,26 @@ class TaskControllerTest extends BaseApiIntegrationTest {
 //                assertThat(found.suggestion()).isEqualTo(createTaskDTO.suggestion());
                 assertThat(found.suggestion()).isNull();
                 assertThat(found.userId()).isEqualTo(user.getId());
+            }
+        }
+
+        @Nested
+        @DisplayName("401 unauthorized")
+        class Unauthorized {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return an unauthorized status code when getting a task and user is unauthorized")
+            void shouldReturnAnUnauthorizedStatusCodeWhenGettingATaskAndUserIsUnauthorized() {
+                given()
+                    .contentType("application/json")
+                    .port(RestAssured.port)
+                .when()
+                    .get("api/v1/task/get/" + UUID.randomUUID())
+                .then()
+                    .log()
+                    .ifValidationFails(LogDetail.BODY)
+                    .statusCode(HttpStatus.UNAUTHORIZED.value());
             }
         }
     }
