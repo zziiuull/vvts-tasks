@@ -31,4 +31,15 @@ public class UserBuilder {
                 .role(Role.USER)
                 .build();
     }
+
+    public static User withIdAndEmail(UUID id, String email) {
+        return User.builder()
+                .id(id)
+                .name("Test")
+                .lastname("User")
+                .email(email)
+                .password("encoded-password")
+                .role(Role.USER)
+                .build();
+    }
 }
