@@ -17,4 +17,9 @@ public class LoginPageObject extends BasePageObject {
     private final By loginButton = By.cssSelector("button[type='submit']");
     private final By registerButton = By.id("toRegisterBtn");
     private final By errorMessage = By.id("errorMessage");
+
+    public void fillUsername(String username) {
+        driver.findElement(usernameField).clear();
+        driver.findElement(usernameField).sendKeys(username);
+    }
 }
