@@ -301,6 +301,44 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                             .statusCode(HttpStatus.BAD_REQUEST.value());
                 }
             }
+
+            @Nested
+            @DisplayName("401 unauthorized")
+            class Unauthorized {
+                @Test
+                @Tag("ApiTest")
+                @Tag("IntegrationTest")
+                @DisplayName("Should return an unauthorized status code when editing a task and user is unauthorized")
+                void shouldReturnAnUnauthorizedStatusCodeWhenEditingATaskAndUserIsUnauthorized() {
+                    final CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+
+                    final ResponseTaskDTO response =
+                            given().contentType("application/json")
+                                    .port(RestAssured.port)
+                                    .body(createTaskDTO)
+                                    .header("Authorization", authorizationHeader)
+                                    .when()
+                                    .post("api/v1/task/create")
+                                    .then()
+                                    .log()
+                                    .ifValidationFails(LogDetail.BODY)
+                                    .statusCode(HttpStatus.CREATED.value())
+                                    .extract()
+                                    .as(ResponseTaskDTO.class);
+
+                    final CreateTaskDTO editTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+
+                    given().contentType("application/json")
+                            .port(RestAssured.port)
+                            .body(editTaskDTO)
+                            .when()
+                            .put("api/v1/task/edit")
+                            .then()
+                            .log()
+                            .ifValidationFails(LogDetail.BODY)
+                            .statusCode(HttpStatus.UNAUTHORIZED.value());
+                }
+            }
         }
     }
 
