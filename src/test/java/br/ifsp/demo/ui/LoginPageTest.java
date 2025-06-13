@@ -73,6 +73,18 @@ class LoginPageTest extends BaseSeleniumTest {
         assertThat(error).contains("password");
     }
 
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should reject incorrect credentials")
+    void shouldRejectIncorrectCredentials() {
+        loginPage.fillUsername("fakeuser@ifsp.edu.br");
+        loginPage.fillPassword("wrongpass");
+        loginPage.clickLogin();
+
+        String error = loginPage.waitForErrorMessage();
+        assertThat(error).contains("incorrect");
+    }
+
 
 
 }
