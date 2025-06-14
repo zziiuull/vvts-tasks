@@ -981,7 +981,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
     }
 
     @Nested
-    @DisplayName("GET /check-time-exceeded/{id}")
+    @DisplayName("GET /notify-time-exceeded/{id}")
     class CheckAndNotifyTimeExceededTests {
         @Nested
         @DisplayName("200 OK")
@@ -990,7 +990,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
             @Tag("ApiTest")
             @Tag("IntegrationTest")
             @DisplayName("should notify if time is exceeded")
-            void shouldReturnFalseIfTimeIsNotExceeded() {
+            void shouldNotifyIfTimeIsNotExceeded() {
                 CreateTaskDTO taskDTO = new CreateTaskDTO(
                         "Title",
                         "Desc",
@@ -1046,5 +1046,57 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                         .statusCode(HttpStatus.NOT_FOUND.value());
             }
         }
+    }
+
+    @Nested
+    @DisplayName("GET /clock-out-forgotten/{id}")
+    class CheckForForgotten {
+        @Nested
+        @DisplayName("200 OK")
+        class Ok {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("should check if clock out was forgotten")
+            void shouldCheckIfClockOutWasForgotten() {
+                CreateTaskDTO taskDTO = new CreateTaskDTO(
+                        "Title",
+                        "Desc",
+                        LocalDateTime.now().plusHours(2),
+                        10,
+                        null
+                );
+
+                ResponseTaskDTO task =
+                        given()
+                                .contentType("application/json")
+                                .header("Authorization", authorizationHeader)
+                                .body(taskDTO)
+                                .when()
+                                .post("/api/v1/task/create")
+                                .then()
+                                .statusCode(HttpStatus.CREATED.value())
+                                .extract().as(ResponseTaskDTO.class);
+
+                given()
+                        .header("Authorization", authorizationHeader)
+                        .when()
+                        .put("/api/v1/task/clock-in/" + task.id())
+                        .then()
+                        .statusCode(HttpStatus.NO_CONTENT.value());
+
+                Map response = given()
+                        .header("Authorization", authorizationHeader)
+                        .when()
+                        .get("/api/v1/task/clock-out-forgotten/" + task.id())
+                        .then()
+                        .statusCode(HttpStatus.OK.value())
+                        .extract().as(Map.class);
+
+                assertThat(response.get("status")).isEqualTo("Task is within the estimated time or clock-out is already registered.");
+            }
+        }
+
+        
     }
 }
