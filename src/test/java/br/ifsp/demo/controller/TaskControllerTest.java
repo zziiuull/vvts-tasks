@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
@@ -916,5 +917,50 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                 .when().get("/api/v1/task/spent-time/" + task.id())
                 .then().statusCode(HttpStatus.FORBIDDEN.value());
         }
+    }
+
+    @Nested
+    @DisplayName("GET /check-time-exceeded/{id}")
+    class CheckTimeExceededTests {
+        @Nested
+        @DisplayName("200 OK")
+        class Ok {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("should return false if time is not exceeded")
+            void shouldReturnFalseIfTimeIsNotExceeded() {
+                CreateTaskDTO taskDTO = new CreateTaskDTO(
+                        "Title",
+                        "Desc",
+                        LocalDateTime.now().plusDays(2),
+                        10,
+                        null
+                );
+
+                ResponseTaskDTO task =
+                        given()
+                            .contentType("application/json")
+                            .header("Authorization", authorizationHeader)
+                            .body(taskDTO)
+                        .when()
+                            .post("/api/v1/task/create")
+                        .then()
+                            .statusCode(HttpStatus.CREATED.value())
+                            .extract().as(ResponseTaskDTO.class);
+
+                Map response = given()
+                    .header("Authorization", authorizationHeader)
+                .when()
+                    .get("/api/v1/task/check-time-exceeded/" + task.id())
+                .then()
+                    .statusCode(HttpStatus.OK.value())
+                        .extract().as(Map.class);
+
+                assertThat(response.get("status")).isEqualTo(false);
+            }
+        }
+
+        
     }
 }
