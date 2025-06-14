@@ -1097,6 +1097,22 @@ class TaskControllerTest extends BaseApiIntegrationTest {
             }
         }
 
-        
+        @Nested
+        @DisplayName("404 not found")
+        class NotFound {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("should return not found status code when checking a non existent task")
+            void shouldReturnNotFoundStatusCodeWhenCheckingANonExistentTask() {
+                given()
+                        .port(RestAssured.port)
+                        .header("Authorization", authorizationHeader)
+                        .when()
+                        .get("/api/v1/task/clock-out-forgotten/" + UUID.randomUUID())
+                        .then()
+                        .statusCode(HttpStatus.NOT_FOUND.value());
+            }
+        }
     }
 }
