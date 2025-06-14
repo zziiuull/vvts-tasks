@@ -967,8 +967,8 @@ class TaskControllerTest extends BaseApiIntegrationTest {
             @Test
             @Tag("ApiTest")
             @Tag("IntegrationTest")
-            @DisplayName("should return not found when checking a non existent task")
-            void shouldReturnNotFoundWhenCheckingANonExistentTask() {
+            @DisplayName("should return not found status code when checking a non existent task")
+            void shouldReturnNotFoundStatusCodeWhenCheckingANonExistentTask() {
                 given()
                     .port(RestAssured.port)
                     .header("Authorization", authorizationHeader)
@@ -978,5 +978,57 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                     .statusCode(HttpStatus.NOT_FOUND.value());
             }
         }
+    }
+
+    @Nested
+    @DisplayName("GET /check-time-exceeded/{id}")
+    class CheckAndNotifyTimeExceededTests {
+        @Nested
+        @DisplayName("200 OK")
+        class Ok {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("should notify if time is exceeded")
+            void shouldReturnFalseIfTimeIsNotExceeded() {
+                CreateTaskDTO taskDTO = new CreateTaskDTO(
+                        "Title",
+                        "Desc",
+                        LocalDateTime.now().plusHours(2),
+                        10,
+                        null
+                );
+
+                ResponseTaskDTO task =
+                        given()
+                                .contentType("application/json")
+                                .header("Authorization", authorizationHeader)
+                                .body(taskDTO)
+                                .when()
+                                .post("/api/v1/task/create")
+                                .then()
+                                .statusCode(HttpStatus.CREATED.value())
+                                .extract().as(ResponseTaskDTO.class);
+
+                given()
+                        .header("Authorization", authorizationHeader)
+                        .when()
+                        .put("/api/v1/task/clock-in/" + task.id())
+                        .then()
+                        .statusCode(HttpStatus.NO_CONTENT.value());
+
+                Map response = given()
+                        .header("Authorization", authorizationHeader)
+                        .when()
+                        .get("/api/v1/task/notify-time-exceeded/" + task.id())
+                        .then()
+                        .statusCode(HttpStatus.OK.value())
+                        .extract().as(Map.class);
+
+                assertThat(response.get("status")).isEqualTo("Time exceeded! Please register the clock-out.");
+            }
+        }
+
+        
     }
 }
