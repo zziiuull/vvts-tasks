@@ -930,13 +930,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
             @Tag("IntegrationTest")
             @DisplayName("should return false if time is not exceeded")
             void shouldReturnFalseIfTimeIsNotExceeded() {
-                CreateTaskDTO taskDTO = new CreateTaskDTO(
-                        "Title",
-                        "Desc",
-                        LocalDateTime.now().plusDays(2),
-                        10,
-                        null
-                );
+                CreateTaskDTO taskDTO = EntityBuilder.createRandomCreateTaskDTO();
 
                 ResponseTaskDTO task =
                         given()
@@ -991,13 +985,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
             @Tag("IntegrationTest")
             @DisplayName("should notify if time is exceeded")
             void shouldNotifyIfTimeIsNotExceeded() {
-                CreateTaskDTO taskDTO = new CreateTaskDTO(
-                        "Title",
-                        "Desc",
-                        LocalDateTime.now().plusHours(2),
-                        10,
-                        null
-                );
+                CreateTaskDTO taskDTO = EntityBuilder.createRandomCreateTaskDTO();
 
                 ResponseTaskDTO task =
                         given()
@@ -1059,13 +1047,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
             @Tag("IntegrationTest")
             @DisplayName("should check if clock out was forgotten")
             void shouldCheckIfClockOutWasForgotten() {
-                CreateTaskDTO taskDTO = new CreateTaskDTO(
-                        "Title",
-                        "Desc",
-                        LocalDateTime.now().plusHours(2),
-                        10,
-                        null
-                );
+                CreateTaskDTO taskDTO = EntityBuilder.createRandomCreateTaskDTO();
 
                 ResponseTaskDTO task =
                         given()
@@ -1114,5 +1096,58 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                         .statusCode(HttpStatus.NOT_FOUND.value());
             }
         }
+    }
+
+    @Nested
+    @DisplayName("GET /clock-out-forgotten/{id}")
+    class CheckForForgottenCompletedTask {
+        @Nested
+        @DisplayName("200 OK")
+        class Ok {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("should check if clock out was forgotten")
+            void shouldCheckIfClockOutWasForgotten() {
+                CreateTaskDTO taskDTO = EntityBuilder.createRandomCreateTaskDTO();
+
+                ResponseTaskDTO task =
+                        given()
+                                .contentType("application/json")
+                                .header("Authorization", authorizationHeader)
+                                .body(taskDTO)
+                                .when()
+                                .post("/api/v1/task/create")
+                                .then()
+                                .statusCode(HttpStatus.CREATED.value())
+                                .extract().as(ResponseTaskDTO.class);
+
+                given()
+                        .header("Authorization", authorizationHeader)
+                        .when()
+                        .put("/api/v1/task/clock-in/" + task.id())
+                        .then()
+                        .statusCode(HttpStatus.NO_CONTENT.value());
+
+                given()
+                        .header("Authorization", authorizationHeader)
+                        .when()
+                        .put("/api/v1/task/clock-out/" + task.id())
+                        .then()
+                        .statusCode(HttpStatus.NO_CONTENT.value());
+
+                Map response = given()
+                        .header("Authorization", authorizationHeader)
+                        .when()
+                        .get("/api/v1/task/clock-out-forgotten-completed-task/" + task.id())
+                        .then()
+                        .statusCode(HttpStatus.OK.value())
+                        .extract().as(Map.class);
+
+                assertThat(response.get("status")).isEqualTo("Clock-out is no longer necessary as the task is already completed.");
+            }
+        }
+
+
     }
 }
