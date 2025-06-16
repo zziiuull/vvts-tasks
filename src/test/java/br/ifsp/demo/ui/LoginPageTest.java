@@ -23,7 +23,7 @@ class LoginPageTest extends BaseSeleniumTest {
 
     @Override
     protected void setInitialPage() {
-        driver.get("file://front/html/index.html");
+        driver.get("http://localhost:8081/index.html");
         loginPage = new LoginPageObject(driver);
     }
 
@@ -99,10 +99,10 @@ class LoginPageTest extends BaseSeleniumTest {
         loginPage.fillPassword(password);
         loginPage.clickLogin();
 
-        Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        wait.until(web -> Objects.requireNonNull(web.getCurrentUrl()).contains("task"));
+        Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(web -> Objects.requireNonNull(web.getCurrentUrl()).contains("tasklist.html"));
 
-        assertThat(driver.getCurrentUrl()).contains("task");
+        assertThat(driver.getCurrentUrl()).contains("tasklist.html");
     }
 
     @Test
