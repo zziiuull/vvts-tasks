@@ -5,11 +5,7 @@ import br.ifsp.demo.ui.utils.Auth;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.FluentWait;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -33,19 +29,7 @@ public class DeleteTaskTest extends BaseSeleniumTest {
         String password = faker.internet().password();
         var taskListPage = Auth.registerAndLogin(driver, email, password);
 
-        new FluentWait<>(driver)
-                .withTimeout(Duration.ofSeconds(5))
-                .pollingEvery(Duration.ofMillis(300))
-                .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
-
         var createTaskPage = taskListPage.navigateToCreateTaskPage();
-
-        new FluentWait<>(driver)
-                .withTimeout(Duration.ofSeconds(5))
-                .pollingEvery(Duration.ofMillis(500))
-                .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(createTaskPage.byCreateButton()));
 
         String title = faker.name().title();
         createTaskPage.fillTaskTitle(title);
@@ -65,19 +49,7 @@ public class DeleteTaskTest extends BaseSeleniumTest {
 
         taskListPage = createTaskPage.submitTask();
 
-        new FluentWait<>(driver)
-                .withTimeout(Duration.ofSeconds(5))
-                .pollingEvery(Duration.ofMillis(500))
-                .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
-
         var taskPage = taskListPage.navigateToTaskPage(title);
-
-        new FluentWait<>(driver)
-                .withTimeout(Duration.ofSeconds(5))
-                .pollingEvery(Duration.ofMillis(500))
-                .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
 
         String alertMessage = taskPage.deleteTask();
         taskListPage = new TaskListPageObject(driver);
