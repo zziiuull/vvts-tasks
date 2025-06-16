@@ -1,4 +1,4 @@
-package br.ifsp.demo.util;
+package br.ifsp.demo.repository.util;
 
 import br.ifsp.demo.tasks.TaskEntity;
 import br.ifsp.demo.tasks.TaskStatus;

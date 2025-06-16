@@ -2,7 +2,7 @@ package br.ifsp.demo.repository;
 
 import br.ifsp.demo.security.user.JpaUserRepository;
 import br.ifsp.demo.security.user.User;
-import br.ifsp.demo.util.UserBuilder;
+import br.ifsp.demo.repository.util.UserBuilder;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
