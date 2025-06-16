@@ -4,6 +4,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 public class TaskListPageObject extends BasePageObject {
     private static final String PAGE_TITLE = "Task List";
 
@@ -12,32 +14,30 @@ public class TaskListPageObject extends BasePageObject {
         if (!PAGE_TITLE.equals(pageTitle())) throw new IllegalStateException("Wrong page url: " + driver.getCurrentUrl());
     }
 
+    private final By createTask = By.id("add-task-btn");
+
+    public By byCreateTask(){
+        return createTask;
+    }
+
     public CreateTaskPageObject navigateToCreateTaskPage() {
-        driver.findElement(By.id("add-task-btn")).click();
+        driver.findElement(createTask).click();
         return new CreateTaskPageObject(driver);
     }
 
-    public BasePageObject navigateToTaskPage(String taskId) {
-        driver.findElement(By.id("task-" + taskId)).click();
-        return new BasePageObject(driver);
+    public TaskPageObject navigateToTaskPage(String taskTitle) {
+        List<WebElement> elements = driver.findElements(By.cssSelector("li.list-group-item"));
+        for (WebElement element : elements) {
+            String title = element.findElement(By.className("task-title")).getText();
+            if (title.equals(taskTitle)) {
+                element.click();
+                return new TaskPageObject(driver);
+            }
+        }
+        throw new IllegalStateException("Task title not found: " + taskTitle);
     }
 
-    public WebElement taskList(){
+    public WebElement getTaskList(){
         return driver.findElement(By.id("task-list"));
-    }
-
-    public String taskTitle(String taskId) {
-        return taskList().findElement(By.cssSelector("task-" + taskId + " task-title")).getText();
-    }
-
-    public String taskDescription(String taskId) {
-        return taskList().findElement(By.cssSelector("task-" + taskId + " task-description")).getText();
-    }
-
-    public String taskStatus(String taskId) {
-        return taskList().findElement(By.cssSelector("task-" + taskId + " task-status")).getText();}
-
-    public String taskDeadline(String taskId) {
-        return taskList().findElement(By.cssSelector("task-" + taskId + " task-deadline")).getText();
     }
 }

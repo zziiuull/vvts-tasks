@@ -18,19 +18,19 @@ public class TaskPageObject extends BasePageObject {
         return taskTitle;
     }
 
-    public WebElement getTaskTitle() {
-        return driver.findElement(taskTitle);
+    public String getTaskTitle() {
+        return driver.findElement(taskTitle).getText();
     }
 
-    public WebElement getTaskDescription() {
-        return driver.findElement(By.cssSelector("#task-container p:first-of-type"));
+    public String getTaskDescription() {
+        return driver.findElement(By.cssSelector("#task-container p:first-of-type")).getText();
     }
 
-    public WebElement getTaskStatus() {
-        return driver.findElement(By.cssSelector("#task-container p:nth-of-type(2)"));
+    public String getTaskStatus() {
+        return driver.findElement(By.cssSelector("#task-container p:nth-of-type(2)")).getText();
     }
 
-    public WebElement getTaskDeadline() {
-        return driver.findElement(By.cssSelector("#task-container p:nth-of-type(3)"));
+    public String getTaskDeadline() {
+        return driver.findElement(By.cssSelector("#task-container p:nth-of-type(3)")).getText();
     }
 }

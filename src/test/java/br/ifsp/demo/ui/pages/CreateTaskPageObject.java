@@ -1,6 +1,7 @@
 package br.ifsp.demo.ui.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 
 public class CreateTaskPageObject extends BasePageObject {
@@ -11,7 +12,7 @@ public class CreateTaskPageObject extends BasePageObject {
         if (!PAGE_TITLE.equals(pageTitle())) throw new IllegalStateException("Wrong page url: " + driver.getCurrentUrl());
     }
 
-    private final By createButton = By.id("create-task-button");
+    private final By createButton = By.id("create-task-btn");
 
     public By byCreateButton(){
         return createButton;
@@ -27,14 +28,15 @@ public class CreateTaskPageObject extends BasePageObject {
         description.sendKeys(taskDescription);
     }
 
-    public void fillTaskDeadline(String taskDeadline) {
+    public void fillTaskDeadline(String date, String time) {
         var deadline = driver.findElement(By.id("task-deadline"));
-        deadline.sendKeys(taskDeadline);
+        deadline.sendKeys(date);
+        deadline.sendKeys(Keys.TAB);
+        deadline.sendKeys(time);
     }
 
     public TaskListPageObject submitTask() {
-        var submitButton = driver.findElement(createButton);
-        submitButton.click();
+        driver.findElement(createButton).click();
         return new TaskListPageObject(driver);
     }
 

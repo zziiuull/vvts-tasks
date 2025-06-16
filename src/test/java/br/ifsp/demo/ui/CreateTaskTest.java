@@ -1,14 +1,113 @@
 package br.ifsp.demo.ui;
 
-import br.ifsp.demo.ui.pages.CreateTaskPageObject;
+import br.ifsp.demo.ui.pages.LoginPageObject;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class CreateTaskTest extends BaseSeleniumTest {
-    private CreateTaskPageObject createTaskPage;
-
     @Override
-    public void setInitialPage(){
-        String page = "file://front/html/createTask.html";
-        driver.get(page);
-        createTaskPage = new CreateTaskPageObject(driver);
+    protected void setInitialPage() {
+        driver.get("http://localhost:8081/index.html");
+    }
+
+    @Test
+    @DisplayName("should create a task")
+    void shouldCreateATask() {
+        var loginPage = new LoginPageObject(driver);
+
+        var registerPage = loginPage.clickRegister();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.elementToBeClickable(registerPage.registerButton()));
+
+        String email = faker.internet().emailAddress();
+        String password = faker.lorem().fixedString(8);
+
+        registerPage.fillName(faker.name().firstName());
+        registerPage.fillLastnameField(faker.name().lastName());
+        registerPage.fillEmail(email);
+        registerPage.fillPassword(password);
+        loginPage = registerPage.clickRegister();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(300))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.elementToBeClickable(loginPage.byUsernameField()));
+
+        loginPage.fillUsername(email);
+        loginPage.fillPassword(password);
+        var taskListPage = loginPage.clickLogin();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(300))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+
+        var createTaskPage = taskListPage.navigateToCreateTaskPage();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.elementToBeClickable(createTaskPage.byCreateButton()));
+
+        String title = faker.name().title();
+        createTaskPage.fillTaskTitle(title);
+
+        String description = faker.lorem().sentence();
+        createTaskPage.fillTaskDescription(description);
+
+        Date futureDate = faker.date().future(365, TimeUnit.DAYS);
+        LocalDateTime futureDateTime = futureDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("ddMMyyyy");
+        String date = futureDateTime.format(dateFormatter);
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
+        String time = futureDateTime.format(timeFormatter);
+        createTaskPage.fillTaskDeadline(date, time);
+
+        taskListPage = createTaskPage.submitTask();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+
+        var taskPage = taskListPage.navigateToTaskPage(title);
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
+
+
+        DateTimeFormatter expectedDeadlineFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        String expectedDeadline = futureDateTime.format(expectedDeadlineFormatter) + ":00";
+
+        assertThat(taskPage.getTaskTitle()).isEqualTo(title);
+        assertThat(taskPage.getTaskDescription()).isEqualTo(description);
+        assertThat(taskPage.getTaskDeadline()).isEqualTo("Deadline: " + expectedDeadline);
+        assertThat(taskPage.getTaskStatus()).isEqualTo("Status: PENDING");
     }
 }

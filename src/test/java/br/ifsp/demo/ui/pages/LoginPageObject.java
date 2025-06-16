@@ -23,8 +23,8 @@ public class LoginPageObject extends BasePageObject {
     private final By registerButton = By.id("toRegisterBtn");
     private final By errorMessage = By.id("errorMessage");
 
-    public By loginButton() {
-        return loginButton;
+    public By byUsernameField() {
+        return usernameField;
     }
 
     public void fillUsername(String username) {
