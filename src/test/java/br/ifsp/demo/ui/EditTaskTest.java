@@ -12,7 +12,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -84,7 +83,6 @@ public class EditTaskTest extends BaseSeleniumTest {
         EditTaskPageObject editTaskPageObject = taskPage.editTask();
 
         String newTaskTitle = faker.name().title();
-        String newDescription = faker.lorem().sentence(10);
         Date newFutureDate = faker.date().future(365, TimeUnit.DAYS);
         LocalDateTime newFutureDateTime = newFutureDate.toInstant()
                 .atZone(ZoneId.systemDefault())
@@ -93,15 +91,143 @@ public class EditTaskTest extends BaseSeleniumTest {
         String newTime = newFutureDateTime.format(timeFormatter);
 
         editTaskPageObject.fillTaskTitleInput(newTaskTitle);
-        editTaskPageObject.fillTaskDescriptionInput(newDescription);
+        editTaskPageObject.blankTaskDescription();
         editTaskPageObject.fillTaskDeadlineInput(newDate, newTime);
 
-        TaskListPageObject taskListPageObject = editTaskPageObject.editTask();
+        editTaskPageObject.tryEditTask();
 
-        DateTimeFormatter expectedDeadlineFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        String expectedDeadline = newFutureDateTime.format(expectedDeadlineFormatter) + ":00";
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.visibilityOfElementLocated(editTaskPageObject.getErrorMessageLocator()));
 
-        TaskPageObject taskPageObject = taskListPageObject.navigateToTaskPage(newTaskTitle);
+        assertThat(editTaskPageObject.getErrorMessage()).isEqualTo("All fields are required.");
+        assertThat(driver.getTitle()).isEqualTo(EditTaskPageObject.PAGE_TITLE);
+    }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should not edit a task and show all fiels are required message when deadline is empty")
+    void shouldNotEditATaskAndShowAllFielsAreRequiredMessageWhenDeadlineIsEmpty(){
+        String email = faker.internet().emailAddress();
+        String password = faker.internet().password();
+        var taskListPage = Auth.registerAndLogin(driver, email, password);
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(300))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+
+        var createTaskPage = taskListPage.navigateToCreateTaskPage();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.elementToBeClickable(createTaskPage.byCreateButton()));
+
+        String title = faker.name().title();
+        createTaskPage.fillTaskTitle(title);
+
+        String description = faker.lorem().sentence();
+        createTaskPage.fillTaskDescription(description);
+
+        Date futureDate = faker.date().future(365, TimeUnit.DAYS);
+        LocalDateTime futureDateTime = futureDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("ddMMyyyy");
+        String date = futureDateTime.format(dateFormatter);
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
+        String time = futureDateTime.format(timeFormatter);
+        createTaskPage.fillTaskDeadline(date, time);
+
+        taskListPage = createTaskPage.submitTask();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+
+        var taskPage = taskListPage.navigateToTaskPage(title);
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
+
+        EditTaskPageObject editTaskPageObject = taskPage.editTask();
+
+        String newTaskTitle = faker.name().title();
+        String newDescription = faker.lorem().sentence(3);
+
+        editTaskPageObject.fillTaskTitleInput(newTaskTitle);
+        editTaskPageObject.fillTaskDescriptionInput(newDescription);
+        editTaskPageObject.blankTaskDeadline();
+
+        editTaskPageObject.tryEditTask();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.visibilityOfElementLocated(editTaskPageObject.getErrorMessageLocator()));
+
+        assertThat(editTaskPageObject.getErrorMessage()).isEqualTo("All fields are required.");
+        assertThat(driver.getTitle()).isEqualTo(EditTaskPageObject.PAGE_TITLE);
+    }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should not edit a task and show alert when deadline is in past")
+    void shouldNotEditATaskAndShowAlertWhenDeadlineIsInPast(){
+        String email = faker.internet().emailAddress();
+        String password = faker.internet().password();
+        var taskListPage = Auth.registerAndLogin(driver, email, password);
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(300))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+
+        var createTaskPage = taskListPage.navigateToCreateTaskPage();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.elementToBeClickable(createTaskPage.byCreateButton()));
+
+        String title = faker.name().title();
+        createTaskPage.fillTaskTitle(title);
+
+        String description = faker.lorem().sentence();
+        createTaskPage.fillTaskDescription(description);
+
+        Date futureDate = faker.date().past(365, TimeUnit.DAYS);
+        LocalDateTime futureDateTime = futureDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("ddMMyyyy");
+        String date = futureDateTime.format(dateFormatter);
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
+        String time = futureDateTime.format(timeFormatter);
+        createTaskPage.fillTaskDeadline(date, time);
+
+        taskListPage = createTaskPage.submitTask();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+
+        var taskPage = taskListPage.navigateToTaskPage(title);
 
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))

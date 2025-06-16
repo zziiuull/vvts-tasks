@@ -47,12 +47,6 @@ class LoginPageTest extends BaseSeleniumTest {
     void shouldNavigateToRegisterPage() {
         loginPage.navigateToRegisterPage();
 
-        Wait<WebDriver> wait = new FluentWait<>(driver)
-                .withTimeout(Duration.ofSeconds(5))
-                .pollingEvery(Duration.ofMillis(300))
-                .ignoring(NoSuchElementException.class);
-
-        wait.until(webDriver -> Objects.requireNonNull(webDriver.getTitle()).equalsIgnoreCase("Register"));
         assertThat(driver.getTitle()).isEqualTo("Register");
     }
 
@@ -103,9 +97,6 @@ class LoginPageTest extends BaseSeleniumTest {
         loginPage.fillPassword(password);
         loginPage.login();
 
-        Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(web -> Objects.requireNonNull(web.getCurrentUrl()).contains("tasklist.html"));
-
         assertThat(driver.getCurrentUrl()).contains("tasklist.html");
     }
 
@@ -137,12 +128,8 @@ class LoginPageTest extends BaseSeleniumTest {
         loginPage.fillPassword("somePassword123");
         loginPage.loginWithFailure();
 
-        new WebDriverWait(driver, Duration.ofSeconds(3))
-                .until(ExpectedConditions.presenceOfElementLocated(By.id("username-error")));
-
-        assertThat(driver.getCurrentUrl())
-                .as("O sistema permitiu login com e-mail inválido: %s", email)
-                .contains("tasklist");
+        String error = loginPage.waitForErrorMessage();
+        assertThat(error).contains("Username or password is incorrect.");
     }
 
 }

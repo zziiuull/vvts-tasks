@@ -1,4 +1,4 @@
-package br.ifsp.demo.util;
+package br.ifsp.demo.repository.util;
 
 import br.ifsp.demo.security.user.Role;
 import br.ifsp.demo.security.user.User;

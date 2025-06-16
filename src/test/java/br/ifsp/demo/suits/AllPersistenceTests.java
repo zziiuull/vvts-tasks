@@ -6,7 +6,7 @@ import org.junit.platform.suite.api.Suite;
 import org.junit.platform.suite.api.SuiteDisplayName;
 
 @Suite
-@SelectPackages("br.ifsp.demo.tasks")
+@SelectPackages("br.ifsp.demo.repository")
 @SuiteDisplayName("All Persistence Tests")
 @IncludeTags({"PersistenceTest"})
 public class AllPersistenceTests {

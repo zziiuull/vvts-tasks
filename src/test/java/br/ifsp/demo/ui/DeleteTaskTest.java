@@ -1,5 +1,6 @@
 package br.ifsp.demo.ui;
 
+import br.ifsp.demo.ui.pages.TaskListPageObject;
 import br.ifsp.demo.ui.utils.Auth;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -9,11 +10,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-public class CreateTaskTest extends BaseSeleniumTest {
+public class DeleteTaskTest extends BaseSeleniumTest {
     @Override
     protected void setInitialPage() {
         driver.get("http://localhost:8081/index.html");
@@ -21,8 +23,8 @@ public class CreateTaskTest extends BaseSeleniumTest {
 
     @Test
     @Tag("UiTest")
-    @DisplayName("should create a task")
-    void shouldCreateATask() {
+    @DisplayName("should delete a task")
+    void shouldDeleteATask() {
         String email = faker.internet().emailAddress();
         String password = faker.internet().password();
         var taskListPage = Auth.registerAndLogin(driver, email, password);
@@ -49,12 +51,10 @@ public class CreateTaskTest extends BaseSeleniumTest {
 
         var taskPage = taskListPage.navigateToTaskPage(title);
 
-        DateTimeFormatter expectedDeadlineFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        String expectedDeadline = futureDateTime.format(expectedDeadlineFormatter) + ":00";
+        String alertMessage = taskPage.deleteTask();
+        taskListPage = new TaskListPageObject(driver);
 
-        assertThat(taskPage.getTaskTitle()).isEqualTo(title);
-        assertThat(taskPage.getTaskDescription()).isEqualTo(description);
-        assertThat(taskPage.getTaskDeadline()).isEqualTo("Deadline: " + expectedDeadline);
-        assertThat(taskPage.getTaskStatus()).isEqualTo("Status: PENDING");
+        assertThat(alertMessage).isEqualTo("Task deleted successfully.");
+        assertThat(taskListPage.getTasks()).isEqualTo(List.of());
     }
 }
