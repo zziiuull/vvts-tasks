@@ -32,10 +32,22 @@ public class EditTaskPageObject extends BasePageObject{
     }
 
     public void fillTaskDeadlineInput(String date, String time){
-         var element = driver.findElement(taskDeadlineInput);
+        var element = driver.findElement(taskDeadlineInput);
         element.sendKeys(date);
         element.sendKeys(Keys.TAB);
         element.sendKeys(time);
+    }
+
+    public void blankTaskTitle(){
+        driver.findElement(taskTitleInput).clear();
+    }
+
+    public void blankTaskDescription(){
+        driver.findElement(taskDescriptionInput).clear();
+    }
+
+    public void blankTaskDeadline(){
+        driver.findElement(taskDeadlineInput).clear();
     }
 
     public TaskListPageObject editTask(){
