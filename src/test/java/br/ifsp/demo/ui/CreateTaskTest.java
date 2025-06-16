@@ -2,6 +2,7 @@ package br.ifsp.demo.ui;
 
 import br.ifsp.demo.ui.utils.Auth;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -23,6 +24,7 @@ public class CreateTaskTest extends BaseSeleniumTest {
     }
 
     @Test
+    @Tag("UiTest")
     @DisplayName("should create a task")
     void shouldCreateATask() {
         String email = faker.internet().emailAddress();
