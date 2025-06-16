@@ -38,7 +38,7 @@ public class LoginPageObject extends BasePageObject {
         driver.findElement(passwordField).sendKeys(password);
     }
 
-    public TaskListPageObject clickLogin() {
+    public TaskListPageObject login() {
         driver.findElement(loginButton).click();
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
@@ -47,7 +47,11 @@ public class LoginPageObject extends BasePageObject {
         return new TaskListPageObject(driver);
     }
 
-    public RegisterPageObject clickRegister() {
+    public void loginWithFailure(){
+        driver.findElement(loginButton).click();
+    }
+
+    public RegisterPageObject navigateToRegisterPage() {
         driver.findElement(registerButton).click();
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))

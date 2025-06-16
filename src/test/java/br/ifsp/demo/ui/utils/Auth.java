@@ -14,7 +14,7 @@ public class Auth {
 
     public static TaskListPageObject registerAndLogin(WebDriver driver, String email, String password) {
         var loginPage = new LoginPageObject(driver);
-        var registerPage = loginPage.clickRegister();
+        var registerPage = loginPage.navigateToRegisterPage();
 
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
@@ -37,7 +37,7 @@ public class Auth {
         loginPage.fillUsername(email);
         loginPage.fillPassword(password);
 
-        var taskListPage = loginPage.clickLogin();
+        var taskListPage = loginPage.login();
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(300))

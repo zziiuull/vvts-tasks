@@ -34,7 +34,7 @@ class LoginPageTest extends BaseSeleniumTest {
     @Tag("UiTest")
     @DisplayName("Should show error when fields are empty")
     void shouldShowErrorWhenFieldsAreEmpty() {
-        loginPage.clickLogin();
+        loginPage.loginWithFailure();
 
         String usernameError = loginPage.waitForUsernameError();
         assertThat(usernameError).isNotBlank();
@@ -45,7 +45,7 @@ class LoginPageTest extends BaseSeleniumTest {
     @Tag("UiTest")
     @DisplayName("Should navigate to register page")
     void shouldNavigateToRegisterPage() {
-        loginPage.clickRegister();
+        loginPage.navigateToRegisterPage();
 
         Wait<WebDriver> wait = new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
@@ -62,7 +62,7 @@ class LoginPageTest extends BaseSeleniumTest {
     void shouldShowErrorForInvalidUsername() {
         loginPage.fillUsername("a");
         loginPage.fillPassword("validPass123");
-        loginPage.clickLogin();
+        loginPage.loginWithFailure();
 
         String error = loginPage.waitForErrorMessage();
         assertThat(error).contains("Username or password is incorrect.");
@@ -74,7 +74,7 @@ class LoginPageTest extends BaseSeleniumTest {
     void shouldShowErrorForEmptyPassword() {
         loginPage.fillUsername("user@email.com");
         loginPage.fillPassword("");
-        loginPage.clickLogin();
+        loginPage.loginWithFailure();
 
         String error = loginPage.waitForPasswordError();
         assertThat(error).contains("Password is required");
@@ -86,7 +86,7 @@ class LoginPageTest extends BaseSeleniumTest {
     void shouldRejectIncorrectCredentials() {
         loginPage.fillUsername("fakeuser@ifsp.edu.br");
         loginPage.fillPassword("wrongpass");
-        loginPage.clickLogin();
+        loginPage.loginWithFailure();
 
         String error = loginPage.waitForErrorMessage();
         assertThat(error).contains("incorrect");
@@ -101,7 +101,7 @@ class LoginPageTest extends BaseSeleniumTest {
 
         loginPage.fillUsername(email);
         loginPage.fillPassword(password);
-        loginPage.clickLogin();
+        loginPage.login();
 
         Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(web -> Objects.requireNonNull(web.getCurrentUrl()).contains("tasklist.html"));
@@ -135,7 +135,7 @@ class LoginPageTest extends BaseSeleniumTest {
     void shouldRejectInvalidEmailFormats(String email) {
         loginPage.fillUsername(email);
         loginPage.fillPassword("somePassword123");
-        loginPage.clickLogin();
+        loginPage.loginWithFailure();
 
         new WebDriverWait(driver, Duration.ofSeconds(3))
                 .until(ExpectedConditions.presenceOfElementLocated(By.id("username-error")));

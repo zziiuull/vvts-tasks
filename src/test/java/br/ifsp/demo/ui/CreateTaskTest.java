@@ -1,10 +1,8 @@
 package br.ifsp.demo.ui;
 
-import br.ifsp.demo.ui.pages.LoginPageObject;
 import br.ifsp.demo.ui.utils.Auth;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
