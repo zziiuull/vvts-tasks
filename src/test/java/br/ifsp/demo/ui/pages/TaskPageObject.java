@@ -1,11 +1,9 @@
 package br.ifsp.demo.ui.pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
@@ -47,5 +45,21 @@ public class TaskPageObject extends BasePageObject {
                 .until(ExpectedConditions.titleIs(EditTaskPageObject.PAGE_TITLE));
 
         return new EditTaskPageObject(driver);
+    }
+
+    public String deleteTask(){
+        driver.findElement(By.id("delete-task-btn")).click();
+
+        final Alert alert = new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(ExpectedConditions.alertIsPresent());
+        String alertMsg = alert.getText();
+        alert.accept();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .until(ExpectedConditions.titleIs(TaskListPageObject.PAGE_TITLE));
+
+        return alertMsg;
     }
 }

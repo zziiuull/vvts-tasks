@@ -44,7 +44,7 @@ public class TaskListPageObject extends BasePageObject {
         throw new IllegalStateException("Task title not found: " + taskTitle);
     }
 
-    public WebElement getTaskList(){
-        return driver.findElement(By.id("task-list"));
+    public List<WebElement> getTasks(){
+        return driver.findElements(By.cssSelector("#taskList li"));
     }
 }
