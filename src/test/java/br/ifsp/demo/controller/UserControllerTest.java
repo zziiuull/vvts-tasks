@@ -1,7 +1,6 @@
-package br.ifsp.demo.security.auth;
+package br.ifsp.demo.controller;
 
-import br.ifsp.demo.controller.BaseApiIntegrationTest;
-import br.ifsp.demo.controller.EntityBuilder;
+import br.ifsp.demo.security.auth.AuthRequest;
 import br.ifsp.demo.security.user.User;
 import io.restassured.filter.log.LogDetail;
 import org.junit.jupiter.api.DisplayName;
