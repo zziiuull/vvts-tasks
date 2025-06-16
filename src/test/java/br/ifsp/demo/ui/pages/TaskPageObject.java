@@ -1,8 +1,13 @@
 package br.ifsp.demo.ui.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+
+import java.time.Duration;
 
 public class TaskPageObject extends BasePageObject {
     public static final String PAGE_TITLE = "Task";
@@ -32,5 +37,15 @@ public class TaskPageObject extends BasePageObject {
 
     public String getTaskDeadline() {
         return driver.findElement(By.cssSelector("#task-container p:nth-of-type(3)")).getText();
+    }
+
+    public EditTaskPageObject editTask(){
+        driver.findElement(By.id("edit-task-btn")).click();
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .until(ExpectedConditions.titleIs(EditTaskPageObject.PAGE_TITLE));
+
+        return new EditTaskPageObject(driver);
     }
 }
