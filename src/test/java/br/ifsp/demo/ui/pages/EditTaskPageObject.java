@@ -48,6 +48,15 @@ public class EditTaskPageObject extends BasePageObject{
         return new TaskListPageObject(driver);
     }
 
+    public EditTaskPageObject tryEditTask(){
+        driver.findElement(createTaskButton).click();
+        return this;
+    }
+
+    public By getErrorMessageLocator(){
+        return errorMessage;
+    }
+
     public String getErrorMessage(){
         return driver.findElement(errorMessage).getText();
     }
