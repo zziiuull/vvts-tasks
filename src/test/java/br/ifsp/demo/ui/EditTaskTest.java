@@ -115,6 +115,87 @@ public class EditTaskTest extends BaseSeleniumTest {
 
     @Test
     @Tag("UiTest")
+    @DisplayName("Should not edit a task and show all fiels are required message when title is empty")
+    void shouldNotEditATaskAndShowAllFielsAreRequiredMessageWhenTitleIsEmpty(){
+        String email = faker.internet().emailAddress();
+        String password = faker.internet().password();
+        var taskListPage = Auth.registerAndLogin(driver, email, password);
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(300))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+
+        var createTaskPage = taskListPage.navigateToCreateTaskPage();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.elementToBeClickable(createTaskPage.byCreateButton()));
+
+        String title = faker.name().title();
+        createTaskPage.fillTaskTitle(title);
+
+        String description = faker.lorem().sentence();
+        createTaskPage.fillTaskDescription(description);
+
+        Date futureDate = faker.date().future(365, TimeUnit.DAYS);
+        LocalDateTime futureDateTime = futureDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("ddMMyyyy");
+        String date = futureDateTime.format(dateFormatter);
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
+        String time = futureDateTime.format(timeFormatter);
+        createTaskPage.fillTaskDeadline(date, time);
+
+        taskListPage = createTaskPage.submitTask();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+
+        var taskPage = taskListPage.navigateToTaskPage(title);
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
+
+        EditTaskPageObject editTaskPageObject = taskPage.editTask();
+
+        String newTaskTitle = "";
+        String newDescription = faker.lorem().sentence(3);
+        Date newFutureDate = faker.date().future(365, TimeUnit.DAYS);
+        LocalDateTime newFutureDateTime = newFutureDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        String newDate = newFutureDateTime.format(dateFormatter);
+        String newTime = newFutureDateTime.format(timeFormatter);
+
+        editTaskPageObject.fillTaskTitleInput(newTaskTitle);
+        editTaskPageObject.fillTaskDescriptionInput(newDescription);
+        editTaskPageObject.fillTaskDeadlineInput(newDate, newTime);
+
+        editTaskPageObject.tryEditTask();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.visibilityOfElementLocated(editTaskPageObject.getErrorMessageLocator()));
+
+        assertThat(editTaskPageObject.getErrorMessage()).isEqualTo("All fields are required.");
+        assertThat(driver.getTitle()).isEqualTo(EditTaskPageObject.PAGE_TITLE);
+    }
+
+    @Test
+    @Tag("UiTest")
     @DisplayName("Should not edit a task and show all fiels are required message when description is empty")
     void shouldNotEditATaskAndShowAllFielsAreRequiredMessageWhenDescriptionIsEmpty(){
         String email = faker.internet().emailAddress();
@@ -193,4 +274,5 @@ public class EditTaskTest extends BaseSeleniumTest {
         assertThat(editTaskPageObject.getErrorMessage()).isEqualTo("All fields are required.");
         assertThat(driver.getTitle()).isEqualTo(EditTaskPageObject.PAGE_TITLE);
     }
+    
 }
