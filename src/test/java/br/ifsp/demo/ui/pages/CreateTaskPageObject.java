@@ -11,17 +11,17 @@ public class CreateTaskPageObject extends BasePageObject {
         if (!PAGE_TITLE.equals(pageTitle())) throw new IllegalStateException("Wrong page url: " + driver.getCurrentUrl());
     }
 
-    public void typeTaskTitle(String taskTitle) {
+    public void fillTaskTitle(String taskTitle) {
         var title = driver.findElement(By.id("task-title"));
         title.sendKeys(taskTitle);
     }
 
-    public void typeTaskDescription(String taskDescription) {
+    public void fillTaskDescription(String taskDescription) {
         var description = driver.findElement(By.id("task-description"));
         description.sendKeys(taskDescription);
     }
 
-    public void typeTaskDeadline(String taskDeadline) {
+    public void fillTaskDeadline(String taskDeadline) {
         var deadline = driver.findElement(By.id("task-deadline"));
         deadline.sendKeys(taskDeadline);
     }
@@ -32,7 +32,7 @@ public class CreateTaskPageObject extends BasePageObject {
         return new TaskListPageObject(driver);
     }
 
-    public String errorMessage(){
+    public String getErrorMessage(){
         return driver.findElement(By.id("error-message")).getText();
     }
 }

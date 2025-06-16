@@ -33,12 +33,14 @@ public class LoginPageObject extends BasePageObject {
         driver.findElement(passwordField).sendKeys(password);
     }
 
-    public void clickLogin() {
+    public TaskListPageObject clickLogin() {
         driver.findElement(loginButton).click();
+        return new TaskListPageObject(driver);
     }
 
-    public void clickRegister() {
+    public RegisterPageObject clickRegister() {
         driver.findElement(registerButton).click();
+        return new RegisterPageObject(driver);
     }
 
     public String getUsernameErrorMessage() {
