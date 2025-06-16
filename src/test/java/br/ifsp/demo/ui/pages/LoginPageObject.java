@@ -55,6 +55,12 @@ public class LoginPageObject extends BasePageObject {
                 .visibilityOfElementLocated(By.id("username-error"))).getText();
     }
 
+    public String waitForPasswordError() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        return wait.until(ExpectedConditions
+                .visibilityOfElementLocated(By.id("password-error"))).getText();
+    }
+
     public String waitForErrorMessage() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
         WebElement error = wait.until(ExpectedConditions.visibilityOfElementLocated(errorMessage));
