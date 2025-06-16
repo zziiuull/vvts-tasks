@@ -4,10 +4,13 @@ import br.ifsp.demo.ui.pages.LoginPageObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -32,9 +35,10 @@ class LoginPageTest extends BaseSeleniumTest {
     @DisplayName("Should show error when fields are empty")
     void shouldShowErrorWhenFieldsAreEmpty() {
         loginPage.clickLogin();
-        String error = loginPage.waitForErrorMessage();
-        assertThat(error).isNotBlank();
-        assertThat(error).contains("required");
+
+        String usernameError = loginPage.waitForUsernameError();
+        assertThat(usernameError).isNotBlank();
+        assertThat(usernameError).contains("Username is required");
     }
 
     @Test
@@ -61,7 +65,7 @@ class LoginPageTest extends BaseSeleniumTest {
         loginPage.clickLogin();
 
         String error = loginPage.waitForErrorMessage();
-        assertThat(error).contains("invalid username");
+        assertThat(error).contains("Username or password is incorrect.");
     }
 
     @Test
@@ -72,8 +76,8 @@ class LoginPageTest extends BaseSeleniumTest {
         loginPage.fillPassword("");
         loginPage.clickLogin();
 
-        String error = loginPage.waitForErrorMessage();
-        assertThat(error).contains("password");
+        String error = loginPage.waitForPasswordError();
+        assertThat(error).contains("Password is required");
     }
 
     @Test
@@ -112,6 +116,33 @@ class LoginPageTest extends BaseSeleniumTest {
         driver.manage().window().setSize(new Dimension(375, 667));
 
         assertThat(driver.findElement(By.className("login-container")).isDisplayed()).isTrue();
+    }
+
+    @ParameterizedTest(name = "[{index}] Invalid email: {0}")
+    @CsvSource({
+            ".@mail.com",
+            "?@mail.com",
+            "@mail.com",
+            "user@mail",
+            "user@.com",
+            "user@com.",
+            "user@@mail.com",
+            "user mail@mail.com",
+            "user<>mail@mail.com"
+    })
+    @Tag("UiTest")
+    @DisplayName("Should reject invalid email formats")
+    void shouldRejectInvalidEmailFormats(String email) {
+        loginPage.fillUsername(email);
+        loginPage.fillPassword("somePassword123");
+        loginPage.clickLogin();
+
+        new WebDriverWait(driver, Duration.ofSeconds(3))
+                .until(ExpectedConditions.presenceOfElementLocated(By.id("username-error")));
+
+        assertThat(driver.getCurrentUrl())
+                .as("O sistema permitiu login com e-mail inválido: %s", email)
+                .contains("tasklist");
     }
 
 }
