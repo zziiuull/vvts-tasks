@@ -41,6 +41,10 @@ public class LoginPageObject extends BasePageObject {
         driver.findElement(registerButton).click();
     }
 
+    public String getUsernameErrorMessage() {
+        return driver.findElement(By.id("username-error")).getText();
+    }
+
     public String waitForErrorMessage() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
         WebElement error = wait.until(ExpectedConditions.visibilityOfElementLocated(errorMessage));
