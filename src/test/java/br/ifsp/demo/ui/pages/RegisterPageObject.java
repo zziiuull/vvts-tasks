@@ -15,7 +15,11 @@ public class RegisterPageObject extends BasePageObject {
     private final By lastnameField = By.id("lastname");
     private final By emailField = By.id("email");
     private final By passwordField = By.id("password");
-    private final By registerButton = By.xpath("//button[text()='Register']");
+    private final By registerButton = By.cssSelector("button[type='submit']");
+
+    public By registerButton() {
+        return registerButton;
+    }
 
     public void fillName(String name) {
         driver.findElement(nameField).sendKeys(name);

@@ -12,8 +12,14 @@ public class TaskPageObject extends BasePageObject {
         if (!PAGE_TITLE.equals(pageTitle())) throw new IllegalStateException("Wrong page url: " + driver.getCurrentUrl());
     }
 
+    private final By taskTitle = By.cssSelector("#task-container h3");
+
+    public By byTaskTitle() {
+        return taskTitle;
+    }
+
     public WebElement getTaskTitle() {
-        return driver.findElement(By.cssSelector("#task-container h3"));
+        return driver.findElement(taskTitle);
     }
 
     public WebElement getTaskDescription() {

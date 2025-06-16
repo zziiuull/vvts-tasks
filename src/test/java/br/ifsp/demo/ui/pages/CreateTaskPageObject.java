@@ -11,6 +11,12 @@ public class CreateTaskPageObject extends BasePageObject {
         if (!PAGE_TITLE.equals(pageTitle())) throw new IllegalStateException("Wrong page url: " + driver.getCurrentUrl());
     }
 
+    private final By createButton = By.id("create-task-button");
+
+    public By byCreateButton(){
+        return createButton;
+    }
+
     public void fillTaskTitle(String taskTitle) {
         var title = driver.findElement(By.id("task-title"));
         title.sendKeys(taskTitle);
@@ -27,7 +33,7 @@ public class CreateTaskPageObject extends BasePageObject {
     }
 
     public TaskListPageObject submitTask() {
-        var submitButton = driver.findElement(By.id("create-task-btn"));
+        var submitButton = driver.findElement(createButton);
         submitButton.click();
         return new TaskListPageObject(driver);
     }
