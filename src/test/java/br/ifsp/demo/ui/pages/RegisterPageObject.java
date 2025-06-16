@@ -2,9 +2,13 @@ package br.ifsp.demo.ui.pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+
+import java.time.Duration;
 
 public class RegisterPageObject extends BasePageObject {
-    private static final String PAGE_TITLE = "Register";
+    public static final String PAGE_TITLE = "Register";
 
     public RegisterPageObject(WebDriver driver) {
         super(driver);
@@ -39,6 +43,10 @@ public class RegisterPageObject extends BasePageObject {
 
     public LoginPageObject clickRegister() {
         driver.findElement(registerButton).click();
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(300))
+                .until(ExpectedConditions.titleIs(LoginPageObject.PAGE_TITLE));
         return new LoginPageObject(driver);
     }
 }

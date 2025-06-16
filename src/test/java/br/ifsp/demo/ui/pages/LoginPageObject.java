@@ -4,12 +4,13 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
 public class LoginPageObject extends BasePageObject {
-    private static final String PAGE_TITLE = "Login";
+    public static final String PAGE_TITLE = "Login";
 
     public LoginPageObject(WebDriver driver) {
         super(driver);
@@ -39,11 +40,19 @@ public class LoginPageObject extends BasePageObject {
 
     public TaskListPageObject clickLogin() {
         driver.findElement(loginButton).click();
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(300))
+                .until(ExpectedConditions.titleIs(TaskListPageObject.PAGE_TITLE));
         return new TaskListPageObject(driver);
     }
 
     public RegisterPageObject clickRegister() {
         driver.findElement(registerButton).click();
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(300))
+                .until(ExpectedConditions.titleIs(RegisterPageObject.PAGE_TITLE));
         return new RegisterPageObject(driver);
     }
 

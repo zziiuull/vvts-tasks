@@ -5,7 +5,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public class TaskPageObject extends BasePageObject {
-    private static final String PAGE_TITLE = "Task";
+    public static final String PAGE_TITLE = "Task";
 
     public TaskPageObject(WebDriver driver) {
         super(driver);

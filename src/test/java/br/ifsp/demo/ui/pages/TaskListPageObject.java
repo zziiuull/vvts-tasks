@@ -3,11 +3,14 @@ package br.ifsp.demo.ui.pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 
+import java.time.Duration;
 import java.util.List;
 
 public class TaskListPageObject extends BasePageObject {
-    private static final String PAGE_TITLE = "Task List";
+    public static final String PAGE_TITLE = "Task List";
 
     public TaskListPageObject(WebDriver driver) {
         super(driver);
@@ -22,6 +25,10 @@ public class TaskListPageObject extends BasePageObject {
 
     public CreateTaskPageObject navigateToCreateTaskPage() {
         driver.findElement(createTask).click();
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(300))
+                .until(ExpectedConditions.titleIs(CreateTaskPageObject.PAGE_TITLE));
         return new CreateTaskPageObject(driver);
     }
 
