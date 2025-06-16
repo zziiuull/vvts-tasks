@@ -1,6 +1,7 @@
 package br.ifsp.demo.ui;
 
 import br.ifsp.demo.ui.pages.LoginPageObject;
+import br.ifsp.demo.ui.utils.Auth;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -26,34 +27,9 @@ public class CreateTaskTest extends BaseSeleniumTest {
     @Test
     @DisplayName("should create a task")
     void shouldCreateATask() {
-        var loginPage = new LoginPageObject(driver);
-
-        var registerPage = loginPage.clickRegister();
-
-        new FluentWait<>(driver)
-                .withTimeout(Duration.ofSeconds(5))
-                .pollingEvery(Duration.ofMillis(500))
-                .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(registerPage.registerButton()));
-
         String email = faker.internet().emailAddress();
-        String password = faker.lorem().fixedString(8);
-
-        registerPage.fillName(faker.name().firstName());
-        registerPage.fillLastnameField(faker.name().lastName());
-        registerPage.fillEmail(email);
-        registerPage.fillPassword(password);
-        loginPage = registerPage.clickRegister();
-
-        new FluentWait<>(driver)
-                .withTimeout(Duration.ofSeconds(5))
-                .pollingEvery(Duration.ofMillis(300))
-                .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(loginPage.byUsernameField()));
-
-        loginPage.fillUsername(email);
-        loginPage.fillPassword(password);
-        var taskListPage = loginPage.clickLogin();
+        String password = faker.internet().password();
+        var taskListPage = Auth.registerAndLogin(driver, email, password);
 
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
