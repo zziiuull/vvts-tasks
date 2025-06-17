@@ -82,8 +82,8 @@ class RegisterPageTest extends BaseSeleniumTest {
 
     @Test
     @Tag("UiTest")
-    @DisplayName("Should show error for empty user")
-    void shouldShowErrorForEmptyUser() {
+    @DisplayName("Should show error for empty name")
+    void shouldShowErrorForEmptyName() {
         String lastname = faker.name().lastName();
         String email = faker.internet().emailAddress();
         String password = faker.internet().password(6, 20);
@@ -95,6 +95,24 @@ class RegisterPageTest extends BaseSeleniumTest {
 
         registerPage.clickRegisterExpectingFailure();
 
-        assertThat(registerPage.getNameError()).contains("name-error");
+        assertThat(registerPage.getNameError()).contains("Name is required.");
+    }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should show error for empty lastname")
+    void shouldShowErrorForEmptyLastName() {
+        String name = faker.name().firstName();
+        String email = faker.internet().emailAddress();
+        String password = faker.internet().password(6, 20);
+
+        registerPage.fillName(name);
+        registerPage.fillLastnameField("");
+        registerPage.fillEmail(email);
+        registerPage.fillPassword(password);
+
+        registerPage.clickRegisterExpectingFailure();
+
+        assertThat(registerPage.getLastNameError()).contains("Last name is required.");
     }
 }
