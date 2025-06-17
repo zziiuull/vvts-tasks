@@ -255,4 +255,18 @@ class RegisterPageTest extends BaseSeleniumTest {
         assertThat(registerPage.getLastNameError()).isNotBlank();
         assertThat(registerPage.getPasswordError()).isNotBlank();
     }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should trim spaces and register normally")
+    void shouldTrimSpacesAndRegisterNormally() {
+        registerPage.fillName(faker.name().firstName() + "  ");
+        registerPage.fillLastnameField(faker.name().lastName() + "  ");
+        registerPage.fillEmail(faker.internet().emailAddress());
+        registerPage.fillPassword(faker.internet().password() + "   ");
+
+        LoginPageObject loginPage = registerPage.clickRegisterExpectingSuccess();
+
+        assertThat(loginPage.pageTitle()).isEqualTo(LoginPageObject.PAGE_TITLE);
+    }
 }
