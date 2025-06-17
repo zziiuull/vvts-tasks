@@ -16,9 +16,14 @@ public class TaskPageObject extends BasePageObject {
     }
 
     private final By taskTitle = By.cssSelector("#task-container h3");
+    private final By errorMessage = By.id("error-message");
 
     public By byTaskTitle() {
         return taskTitle;
+    }
+
+    public By byErrorMessage() {
+        return errorMessage;
     }
 
     public String getTaskTitle() {
@@ -43,6 +48,10 @@ public class TaskPageObject extends BasePageObject {
 
     public String getFinishTime() {
         return driver.findElement(By.cssSelector("#task-container p:nth-of-type(5)")).getText();
+    }
+
+    public String getErrorMessage(){
+        return driver.findElement(errorMessage).getText();
     }
 
     public EditTaskPageObject editTask(){
