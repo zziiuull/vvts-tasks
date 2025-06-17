@@ -2,17 +2,21 @@ package br.ifsp.demo.ui;
 
 import br.ifsp.demo.ui.pages.LoginPageObject;
 import br.ifsp.demo.ui.pages.RegisterPageObject;
+import org.codehaus.plexus.util.cli.Arg;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -172,5 +176,30 @@ class RegisterPageTest extends BaseSeleniumTest {
         String error = driver.findElement(By.id("errorMessage")).getText();
         assertThat(error).contains("Username already exists.");
 
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidPasswords")
+    @DisplayName("Should show error for password length out of bounds")
+    void shouldRejectPasswordWithInvalidLength(String password, String expectedError) {
+        String name = faker.name().firstName();
+        String lastname = faker.name().lastName();
+        String email = faker.internet().emailAddress();
+
+        registerPage.fillName(name);
+        registerPage.fillLastnameField(lastname);
+        registerPage.fillEmail(email);
+        registerPage.fillPassword(password);
+
+        registerPage.clickRegisterExpectingFailure();
+
+        assertThat(registerPage.getPasswordError()).contains(expectedError);
+    }
+
+    private static Stream<Arguments> invalidPasswords() {
+        return Stream.of(
+                Arguments.of("12345", "Password is required."),
+                Arguments.of("a".repeat(21), "Password is required.")
+        );
     }
 }
