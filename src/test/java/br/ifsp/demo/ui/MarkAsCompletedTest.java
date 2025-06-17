@@ -138,7 +138,7 @@ public class MarkAsCompletedTest extends BaseSeleniumTest {
 
     @Test
     @Tag("UiTest")
-    @DisplayName("Should show error message when task status is completed and tries to clock in")
+    @DisplayName("Should show error message when task status is completed and tries to mark as completed")
     void shouldShowErrorMessageWhenTaskStatusIsCompletedAndTriesToMarkAsCompleted(){
         String email = faker.internet().emailAddress();
         String password = faker.internet().password();
@@ -194,12 +194,12 @@ public class MarkAsCompletedTest extends BaseSeleniumTest {
 
         String taskStatusMarkedAsCompleted = taskPage.getTaskStatus();
 
-        taskPage = taskPage.clockIn();
+        taskPage = taskPage.markAsCompleted();
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byErrorMessage()));
 
         assertThat(taskPage.getTaskTitle()).isEqualTo(title);
         assertThat(taskPage.getTaskDescription()).isEqualTo(description);
@@ -207,6 +207,6 @@ public class MarkAsCompletedTest extends BaseSeleniumTest {
         assertThat(alertMarkAsCompletedMsg).isEqualTo("Mark as completed successful.");
         assertThat(taskStatusClockIn).isEqualTo("Status: IN_PROGRESS");
         assertThat(taskStatusMarkedAsCompleted).isEqualTo("Status: COMPLETED");
-        assertThat(taskPage.getErrorMessage()).isEqualTo("Only Pending tasks can be clocked in.");
+        assertThat(taskPage.getErrorMessage()).isEqualTo("Only In progress tasks can be marked as completed.");
     }
 }
