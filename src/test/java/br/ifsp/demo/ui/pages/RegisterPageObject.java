@@ -48,6 +48,11 @@ public class RegisterPageObject extends BasePageObject {
         return driver.findElement(By.id("name-error")).getText();
     }
 
+    public String getLastNameError() {
+        return driver.findElement(By.id("lastname-error")).getText();
+    }
+
+
     public String getEmailError() {
         return driver.findElement(By.id("email-error")).getText();
     }
