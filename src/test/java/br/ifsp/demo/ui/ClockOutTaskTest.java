@@ -217,7 +217,7 @@ public class ClockOutTaskTest extends BaseSeleniumTest {
 
     @Test
     @Tag("UiTest")
-    @DisplayName("Should show error message when task status is pending and tries to clock in")
+    @DisplayName("Should show error message when task status is in progress and tries to clock in")
     void shouldShowErrorMessageWhenTaskStatusIsInProgressAndTriesToClockIn(){
         String email = faker.internet().emailAddress();
         String password = faker.internet().password();
