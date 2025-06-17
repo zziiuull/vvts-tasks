@@ -44,6 +44,10 @@ public class RegisterPageObject extends BasePageObject {
         driver.findElement(passwordField).sendKeys(password);
     }
 
+    public String getNameError() {
+        return driver.findElement(By.id("name-error")).getText();
+    }
+
     public String getEmailError() {
         return driver.findElement(By.id("email-error")).getText();
     }
