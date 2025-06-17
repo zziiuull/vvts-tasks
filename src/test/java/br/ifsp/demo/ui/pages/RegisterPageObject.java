@@ -48,7 +48,7 @@ public class RegisterPageObject extends BasePageObject {
         return driver.findElement(By.id("email-error")).getText();
     }
 
-    public LoginPageObject clickRegister() {
+    public LoginPageObject clickRegisterExpectingSuccess() {
         driver.findElement(registerButton).click();
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
@@ -56,4 +56,6 @@ public class RegisterPageObject extends BasePageObject {
                 .until(ExpectedConditions.titleIs(LoginPageObject.PAGE_TITLE));
         return new LoginPageObject(driver);
     }
+
+
 }
