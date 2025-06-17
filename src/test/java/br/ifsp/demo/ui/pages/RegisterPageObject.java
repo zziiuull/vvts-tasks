@@ -4,6 +4,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
@@ -12,6 +13,8 @@ public class RegisterPageObject extends BasePageObject {
 
     public RegisterPageObject(WebDriver driver) {
         super(driver);
+        new WebDriverWait(driver, Duration.ofSeconds(3))
+                .until(ExpectedConditions.presenceOfElementLocated(By.id("registerForm")));
         if (!PAGE_TITLE.equals(pageTitle())) throw new IllegalStateException("Wrong page url: " + driver.getCurrentUrl());
     }
 
@@ -39,6 +42,10 @@ public class RegisterPageObject extends BasePageObject {
 
     public void fillPassword(String password) {
         driver.findElement(passwordField).sendKeys(password);
+    }
+
+    public String getEmailError() {
+        return driver.findElement(By.id("email-error")).getText();
     }
 
     public LoginPageObject clickRegister() {
