@@ -103,4 +103,62 @@ public class ClockOutTaskTest extends BaseSeleniumTest {
         assertThat(taskPage.getStartTime()).isNotNull();
         assertThat(taskPage.getFinishTime()).isNotNull();
     }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should clock in and clock out successfuly")
+    void shouldShowErrorMessageWhenTaskStatusIsCompletedAndTriesToClockIn(){
+        String email = faker.internet().emailAddress();
+        String password = faker.internet().password();
+        var taskListPageObject = Auth.registerAndLogin(driver, email, password);
+
+        String title = faker.name().title();
+        String description = faker.lorem().sentence(3);
+        Date futureDate = faker.date().future(365, TimeUnit.DAYS);
+        LocalDateTime futureDateTime = futureDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("ddMMyyyy");
+        String date = futureDateTime.format(dateFormatter);
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
+        String time = futureDateTime.format(timeFormatter);
+        taskListPageObject = Task.createTask(driver, taskListPageObject, title, description, date, time);
+
+        var taskPage = taskListPageObject.navigateToTaskPage(title);
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
+
+        taskPage = taskPage.clockIn();
+
+        final Alert alertClockIn = new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(ExpectedConditions.alertIsPresent());
+        String alertClockInMsg = alertClockIn.getText();
+        alertClockIn.accept();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
+
+        String taskStatusClockIn = taskPage.getTaskStatus();
+
+        taskPage = taskPage.clockIn();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byErrorMessage()));
+
+        assertThat(taskPage.getTaskTitle()).isEqualTo(title);
+        assertThat(taskPage.getTaskDescription()).isEqualTo(description);
+        assertThat(alertClockInMsg).isEqualTo("Clock-in successful.");
+        assertThat(taskStatusClockIn).isEqualTo("Status: IN_PROGRESS");
+        assertThat(taskPage.getErrorMessage()).isEqualTo("Only Pending tasks can be clocked in.");
+    }
 }
