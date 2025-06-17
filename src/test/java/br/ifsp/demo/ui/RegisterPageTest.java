@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -285,5 +286,14 @@ class RegisterPageTest extends BaseSeleniumTest {
         assertThat(registerPage.getNameError()).isNotBlank();
         assertThat(registerPage.getLastNameError()).isNotBlank();
         assertThat(registerPage.getPasswordError()).isNotBlank();
+    }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should render register page correctly on small screen")
+    void shouldRenderRegisterPageCorrectlyOnSmallScreen() {
+        driver.manage().window().setSize(new Dimension(375, 667));
+
+        assertThat(driver.findElement(By.className("register-container")).isDisplayed()).isTrue();
     }
 }
