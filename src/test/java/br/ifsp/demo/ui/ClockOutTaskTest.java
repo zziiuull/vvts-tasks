@@ -106,6 +106,43 @@ public class ClockOutTaskTest extends BaseSeleniumTest {
 
     @Test
     @Tag("UiTest")
+    @DisplayName("Should clock in and clock out successfuly")
+    void shouldShowErrorMessageWhenTaskStatusIsPendingAndTriesToClockOut(){
+        String email = faker.internet().emailAddress();
+        String password = faker.internet().password();
+        var taskListPageObject = Auth.registerAndLogin(driver, email, password);
+
+        String title = faker.name().title();
+        String description = faker.lorem().sentence(3);
+        Date futureDate = faker.date().future(365, TimeUnit.DAYS);
+        LocalDateTime futureDateTime = futureDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("ddMMyyyy");
+        String date = futureDateTime.format(dateFormatter);
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
+        String time = futureDateTime.format(timeFormatter);
+        taskListPageObject = Task.createTask(driver, taskListPageObject, title, description, date, time);
+
+        var taskPage = taskListPageObject.navigateToTaskPage(title);
+
+        taskPage.clockOut();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byErrorMessage()));
+
+        assertThat(taskPage.getTaskTitle()).isEqualTo(title);
+        assertThat(taskPage.getTaskDescription()).isEqualTo(description);
+        assertThat(taskPage.getTaskStatus()).isEqualTo("Status: PENDING");
+        // "Only In progress tasks can be clocked out."
+        assertThat(taskPage.getErrorMessage()).isEqualTo("Only In progress tasks can be clocked in.");
+    }
+
+    @Test
+    @Tag("UiTest")
     @DisplayName("Should show error message when task status is completed and tries to clock in")
     void shouldShowErrorMessageWhenTaskStatusIsCompletedAndTriesToClockIn(){
         String email = faker.internet().emailAddress();
