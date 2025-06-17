@@ -26,7 +26,7 @@ public class Auth {
         registerPage.fillLastnameField(faker.name().lastName());
         registerPage.fillEmail(email);
         registerPage.fillPassword(password);
-        loginPage = registerPage.clickRegister();
+        loginPage = registerPage.clickRegisterExpectingSuccess();
 
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))

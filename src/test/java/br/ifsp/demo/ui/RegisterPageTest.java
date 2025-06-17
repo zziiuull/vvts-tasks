@@ -40,7 +40,7 @@ class RegisterPageTest extends BaseSeleniumTest {
         registerPage.fillEmail(email);
         registerPage.fillPassword(password);
 
-        LoginPageObject loginPage = registerPage.clickRegister();
+        LoginPageObject loginPage = registerPage.clickRegisterExpectingSuccess();
 
         new WebDriverWait(driver, Duration.ofSeconds(5))
                 .until(ExpectedConditions.titleIs(LoginPageObject.PAGE_TITLE));
@@ -70,7 +70,7 @@ class RegisterPageTest extends BaseSeleniumTest {
         registerPage.fillEmail(email);
         registerPage.fillPassword(password);
 
-        registerPage.clickRegister();
+        registerPage.clickRegisterExpectingFailure();
 
         WebElement emailError = new WebDriverWait(driver, Duration.ofSeconds(3))
                 .until(ExpectedConditions.visibilityOfElementLocated(By.id("email-error")));
