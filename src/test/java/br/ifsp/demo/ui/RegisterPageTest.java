@@ -151,4 +151,26 @@ class RegisterPageTest extends BaseSeleniumTest {
 
         assertThat(registerPage.getPasswordError()).contains("Password is required.");
     }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should show error when email is already registered")
+    void shouldShowErrorWhenEmailIsAlreadyRegistered() {
+        String email = "registered@mail.com";
+
+        String name = faker.name().firstName();
+        String lastname = faker.name().lastName();
+        String password = faker.internet().password(6, 20);
+
+        registerPage.fillName(name);
+        registerPage.fillLastnameField(lastname);
+        registerPage.fillEmail(email);
+        registerPage.fillPassword(password);
+
+        registerPage.clickRegisterExpectingFailure();
+
+        String error = driver.findElement(By.id("errorMessage")).getText();
+        assertThat(error).contains("Username already exists.");
+
+    }
 }
