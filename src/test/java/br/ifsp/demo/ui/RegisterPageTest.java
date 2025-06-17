@@ -180,7 +180,7 @@ class RegisterPageTest extends BaseSeleniumTest {
 
     @ParameterizedTest
     @MethodSource("invalidPasswords")
-    @DisplayName("Should show error for password length out of bounds")
+    @DisplayName("Should reject password with invalid length")
     void shouldRejectPasswordWithInvalidLength(String password, String expectedError) {
         String name = faker.name().firstName();
         String lastname = faker.name().lastName();
@@ -201,5 +201,24 @@ class RegisterPageTest extends BaseSeleniumTest {
                 Arguments.of("12345", "Password is required."),
                 Arguments.of("a".repeat(21), "Password is required.")
         );
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "@na, Invalid name.",
+            "123, Invalid name.",
+            "L!ma, Invalid last name."
+    })
+    @DisplayName("Should show error for invalid characters in name or lastname")
+    void shouldShowErrorForInvalidCharactersInNameOrLastname(String input) {
+        registerPage.fillName(input);
+        registerPage.fillLastnameField(input);
+        registerPage.fillEmail(faker.internet().emailAddress());
+        registerPage.fillPassword(faker.internet().password());
+
+        registerPage.clickRegisterExpectingFailure();
+
+        assertThat(registerPage.getNameError()).isNotBlank();
+        assertThat(registerPage.getLastNameError()).isNotBlank();
     }
 }
