@@ -179,6 +179,7 @@ class RegisterPageTest extends BaseSeleniumTest {
     }
 
     @ParameterizedTest
+    @Tag("UiTest")
     @MethodSource("invalidPasswords")
     @DisplayName("Should reject password with invalid length")
     void shouldRejectPasswordWithInvalidLength(String password, String expectedError) {
@@ -204,6 +205,7 @@ class RegisterPageTest extends BaseSeleniumTest {
     }
 
     @ParameterizedTest
+    @Tag("UiTest")
     @CsvSource({
             "@na, Invalid name.",
             "123, Invalid name.",
@@ -220,5 +222,21 @@ class RegisterPageTest extends BaseSeleniumTest {
 
         assertThat(registerPage.getNameError()).isNotBlank();
         assertThat(registerPage.getLastNameError()).isNotBlank();
+    }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should reject name and lastname longer than 50 characters")
+    void shouldRejectNameAndLastNameLongerThan50Characters() {
+        String longText = "a".repeat(51);
+        registerPage.fillName(longText);
+        registerPage.fillLastnameField(longText);
+        registerPage.fillEmail(faker.internet().emailAddress());
+        registerPage.fillPassword(faker.internet().password());
+
+        registerPage.clickRegisterExpectingFailure();
+
+        assertThat(registerPage.getNameError()).contains("max length");
+        assertThat(registerPage.getLastNameError()).contains("max length");
     }
 }
