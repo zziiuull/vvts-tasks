@@ -99,4 +99,40 @@ public class MarkAsCompletedTest extends BaseSeleniumTest {
         assertThat(taskStatusClockOut).isEqualTo("Status: COMPLETED");
         assertThat(taskPage.getStartTime()).isNotNull();
     }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should show error message when task status is pending and tries to mark as completed")
+    void shouldShowErrorMessageWhenTaskStatusIsPendingAndTriesToMarkAsCompleted(){
+        String email = faker.internet().emailAddress();
+        String password = faker.internet().password();
+        var taskListPageObject = Auth.registerAndLogin(driver, email, password);
+
+        String title = faker.name().title();
+        String description = faker.lorem().sentence(3);
+        Date futureDate = faker.date().future(365, TimeUnit.DAYS);
+        LocalDateTime futureDateTime = futureDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("ddMMyyyy");
+        String date = futureDateTime.format(dateFormatter);
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
+        String time = futureDateTime.format(timeFormatter);
+        taskListPageObject = Task.createTask(driver, taskListPageObject, title, description, date, time);
+
+        var taskPage = taskListPageObject.navigateToTaskPage(title);
+
+        taskPage.markAsCompleted();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byErrorMessage()));
+
+        assertThat(taskPage.getTaskTitle()).isEqualTo(title);
+        assertThat(taskPage.getTaskDescription()).isEqualTo(description);
+        assertThat(taskPage.getTaskStatus()).isEqualTo("Status: PENDING");
+        assertThat(taskPage.getErrorMessage()).isEqualTo("Only In progress tasks can be marked as completed.");
+    }
 }
