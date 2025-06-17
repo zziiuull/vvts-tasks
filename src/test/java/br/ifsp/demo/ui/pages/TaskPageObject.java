@@ -37,6 +37,14 @@ public class TaskPageObject extends BasePageObject {
         return driver.findElement(By.cssSelector("#task-container p:nth-of-type(3)")).getText();
     }
 
+    public String getStartTime() {
+        return driver.findElement(By.cssSelector("#task-container p:nth-of-type(4)")).getText();
+    }
+
+    public String getFinishTime() {
+        return driver.findElement(By.cssSelector("#task-container p:nth-of-type(5)")).getText();
+    }
+
     public EditTaskPageObject editTask(){
         driver.findElement(By.id("edit-task-btn")).click();
         new FluentWait<>(driver)
@@ -61,5 +69,20 @@ public class TaskPageObject extends BasePageObject {
                 .until(ExpectedConditions.titleIs(TaskListPageObject.PAGE_TITLE));
 
         return alertMsg;
+    }
+
+    public TaskPageObject clockIn(){
+        driver.findElement(By.id("clock-in-btn")).click();
+        return this;
+    }
+
+    public TaskPageObject clockOut(){
+        driver.findElement(By.id("clock-out-btn")).click();
+        return this;
+    }
+
+    public TaskPageObject markAsCompleted(){
+        driver.findElement(By.id("mark-complete-btn")).click();
+        return this;
     }
 }
