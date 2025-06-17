@@ -269,4 +269,21 @@ class RegisterPageTest extends BaseSeleniumTest {
 
         assertThat(loginPage.pageTitle()).isEqualTo(LoginPageObject.PAGE_TITLE);
     }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should reject SQL Injection inputs")
+    void shouldRejectSQLInjectionInputs() {
+        String sql = "' OR '1'='1";
+        registerPage.fillName(sql);
+        registerPage.fillLastnameField(sql);
+        registerPage.fillEmail(faker.internet().emailAddress());
+        registerPage.fillPassword(sql);
+
+        registerPage.clickRegisterExpectingFailure();
+
+        assertThat(registerPage.getNameError()).isNotBlank();
+        assertThat(registerPage.getLastNameError()).isNotBlank();
+        assertThat(registerPage.getPasswordError()).isNotBlank();
+    }
 }
