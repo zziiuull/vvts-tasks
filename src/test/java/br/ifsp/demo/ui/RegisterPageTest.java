@@ -239,4 +239,20 @@ class RegisterPageTest extends BaseSeleniumTest {
         assertThat(registerPage.getNameError()).contains("max length");
         assertThat(registerPage.getLastNameError()).contains("max length");
     }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should reject fields with only spaces")
+    void shouldRejectFieldsWithOnlySpaces() {
+        registerPage.fillName("   ");
+        registerPage.fillLastnameField("   ");
+        registerPage.fillEmail(faker.internet().emailAddress());
+        registerPage.fillPassword("   ");
+
+        registerPage.clickRegisterExpectingFailure();
+
+        assertThat(registerPage.getNameError()).isNotBlank();
+        assertThat(registerPage.getLastNameError()).isNotBlank();
+        assertThat(registerPage.getPasswordError()).isNotBlank();
+    }
 }
