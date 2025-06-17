@@ -132,6 +132,23 @@ class RegisterPageTest extends BaseSeleniumTest {
         registerPage.clickRegisterExpectingFailure();
 
         assertThat(registerPage.getEmailError()).contains("Email is required.");
+    }
 
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should show error for empty password")
+    void shouldShowErrorForEmptyPassword() {
+        String name = faker.name().firstName();
+        String lastname = faker.name().lastName();
+        String email = faker.internet().emailAddress();
+
+        registerPage.fillName(name);
+        registerPage.fillLastnameField(lastname);
+        registerPage.fillEmail(email);
+        registerPage.fillPassword("");
+
+        registerPage.clickRegisterExpectingFailure();
+
+        assertThat(registerPage.getPasswordError()).contains("Password is required.");
     }
 }
