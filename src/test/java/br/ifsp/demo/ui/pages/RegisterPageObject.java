@@ -57,5 +57,8 @@ public class RegisterPageObject extends BasePageObject {
         return new LoginPageObject(driver);
     }
 
+    public void clickRegisterExpectingFailure() {
+        driver.findElement(registerButton).click();
+    }
 
 }
