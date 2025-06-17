@@ -79,4 +79,22 @@ class RegisterPageTest extends BaseSeleniumTest {
                 .as("Esperava mensagem para e-mail inválido: %s", email)
                 .contains("Invalid email format.");
     }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should show error for empty user")
+    void shouldShowErrorForEmptyUser() {
+        String lastname = faker.name().lastName();
+        String email = faker.internet().emailAddress();
+        String password = faker.internet().password(6, 20);
+
+        registerPage.fillName("");
+        registerPage.fillLastnameField(lastname);
+        registerPage.fillEmail(email);
+        registerPage.fillPassword(password);
+
+        registerPage.clickRegisterExpectingFailure();
+
+        assertThat(registerPage.getNameError()).contains("name-error");
+    }
 }
