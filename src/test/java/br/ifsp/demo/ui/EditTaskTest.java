@@ -83,6 +83,7 @@ public class EditTaskTest extends BaseSeleniumTest {
         EditTaskPageObject editTaskPageObject = taskPage.navigateToEditPage();
 
         String newTaskTitle = faker.name().title();
+        String newTaskDescription = faker.lorem().sentence();
         Date newFutureDate = faker.date().future(365, TimeUnit.DAYS);
         LocalDateTime newFutureDateTime = newFutureDate.toInstant()
                 .atZone(ZoneId.systemDefault())
@@ -91,19 +92,17 @@ public class EditTaskTest extends BaseSeleniumTest {
         String newTime = newFutureDateTime.format(timeFormatter);
 
         editTaskPageObject.fillTaskTitleInput(newTaskTitle);
-        editTaskPageObject.blankTaskDescription();
+        editTaskPageObject.fillTaskDescriptionInput(newTaskDescription);
         editTaskPageObject.fillTaskDeadlineInput(newDate, newTime);
 
-        editTaskPageObject.tryEditTask();
+        TaskListPageObject taskListPageObject = editTaskPageObject.editTask();
 
-        new FluentWait<>(driver)
-                .withTimeout(Duration.ofSeconds(5))
-                .pollingEvery(Duration.ofMillis(500))
-                .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.visibilityOfElementLocated(editTaskPageObject.getErrorMessageLocator()));
+        taskPage = taskListPageObject.navigateToTaskPage(newTaskTitle);
 
-        assertThat(editTaskPageObject.getErrorMessage()).isEqualTo("All fields are required.");
-        assertThat(driver.getTitle()).isEqualTo(EditTaskPageObject.PAGE_TITLE);
+        assertThat(taskPage.getTaskTitle()).isEqualTo(newTaskTitle);
+        assertThat(taskPage.getTaskDescription()).isEqualTo(newTaskDescription);
+        assertThat(taskPage.getTaskStatus()).isEqualTo("Status: PENDING");
+        assertThat(taskPage.getTaskDeadline()).isNotNull();
     }
 
     @Test
