@@ -115,4 +115,25 @@ public class CreateTaskTest extends BaseSeleniumTest {
         assertThat(createTaskPage.getErrorMessage()).isEqualTo("All fields are required.");
         assertThat(driver.getTitle()).isEqualTo(CreateTaskPageObject.PAGE_TITLE);
     }
+
+    @Test
+    @DisplayName("should not create a task when deadline is empty")
+    void shouldNotCreateATaskWhenDeadlineIsEmpty() {
+        String email = faker.internet().emailAddress();
+        String password = faker.internet().password();
+        var taskListPage = Auth.registerAndLogin(driver, email, password);
+
+        var createTaskPage = taskListPage.navigateToCreateTaskPage();
+
+        String title = faker.name().title();
+        createTaskPage.fillTaskTitle(title);
+
+        String description = faker.lorem().sentence();
+        createTaskPage.fillTaskDescription(description);
+
+        createTaskPage.submitTaskExpectingFailure();
+
+        assertThat(createTaskPage.getErrorMessage()).isEqualTo("All fields are required.");
+        assertThat(driver.getTitle()).isEqualTo(CreateTaskPageObject.PAGE_TITLE);
+    }
 }
