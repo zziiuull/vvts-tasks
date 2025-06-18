@@ -39,13 +39,17 @@ public class CreateTaskPageObject extends BasePageObject {
         deadline.sendKeys(time);
     }
 
-    public TaskListPageObject submitTask() {
+    public TaskListPageObject submitTaskExpectingSuccess() {
         driver.findElement(createButton).click();
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(300))
                 .until(ExpectedConditions.titleIs(TaskListPageObject.PAGE_TITLE));
         return new TaskListPageObject(driver);
+    }
+
+    public void submitTaskExpectingFailure(){
+        driver.findElement(createButton).click();
     }
 
     public String getErrorMessage(){

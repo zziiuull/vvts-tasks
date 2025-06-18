@@ -64,7 +64,7 @@ public class EditTaskTest extends BaseSeleniumTest {
         String time = futureDateTime.format(timeFormatter);
         createTaskPage.fillTaskDeadline(date, time);
 
-        taskListPage = createTaskPage.submitTask();
+        taskListPage = createTaskPage.submitTaskExpectingSuccess();
 
         new FluentWait<>(driver)
             .withTimeout(Duration.ofSeconds(5))
@@ -144,7 +144,7 @@ public class EditTaskTest extends BaseSeleniumTest {
         String time = futureDateTime.format(timeFormatter);
         createTaskPage.fillTaskDeadline(date, time);
 
-        taskListPage = createTaskPage.submitTask();
+        taskListPage = createTaskPage.submitTaskExpectingSuccess();
 
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
@@ -224,7 +224,7 @@ public class EditTaskTest extends BaseSeleniumTest {
         String time = futureDateTime.format(timeFormatter);
         createTaskPage.fillTaskDeadline(date, time);
 
-        taskListPage = createTaskPage.submitTask();
+        taskListPage = createTaskPage.submitTaskExpectingSuccess();
 
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
@@ -304,7 +304,7 @@ public class EditTaskTest extends BaseSeleniumTest {
         String time = futureDateTime.format(timeFormatter);
         createTaskPage.fillTaskDeadline(date, time);
 
-        taskListPage = createTaskPage.submitTask();
+        taskListPage = createTaskPage.submitTaskExpectingSuccess();
 
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
@@ -379,7 +379,7 @@ public class EditTaskTest extends BaseSeleniumTest {
         String time = futureDateTime.format(timeFormatter);
         createTaskPage.fillTaskDeadline(date, time);
 
-        taskListPage = createTaskPage.submitTask();
+        taskListPage = createTaskPage.submitTaskExpectingSuccess();
 
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
