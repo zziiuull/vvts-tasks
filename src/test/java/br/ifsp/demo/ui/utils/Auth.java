@@ -20,7 +20,7 @@ public class Auth {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(registerPage.registerButton()));
+                .until(ExpectedConditions.elementToBeClickable(registerPage.getRegisterButtonLocator()));
 
         registerPage.fillName(faker.name().firstName());
         registerPage.fillLastnameField(faker.name().lastName());
@@ -32,17 +32,17 @@ public class Auth {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(loginPage.byUsernameField()));
+                .until(ExpectedConditions.elementToBeClickable(loginPage.getUsernameFieldLocator()));
 
         loginPage.fillUsername(email);
         loginPage.fillPassword(password);
 
-        var taskListPage = loginPage.login();
+        var taskListPage = loginPage.clickLoginExpectingSuccess();
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(300))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.getCreateTaskLocator()));
 
         return taskListPage;
     }

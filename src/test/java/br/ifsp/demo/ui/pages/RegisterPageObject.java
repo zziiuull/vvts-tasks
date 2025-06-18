@@ -24,7 +24,7 @@ public class RegisterPageObject extends BasePageObject {
     private final By passwordField = By.id("password");
     private final By registerButton = By.cssSelector("button[type='submit']");
 
-    public By registerButton() {
+    public By getRegisterButtonLocator() {
         return registerButton;
     }
 
