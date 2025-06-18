@@ -1,10 +1,9 @@
 package br.ifsp.demo.ui.pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
@@ -50,6 +49,12 @@ public class CreateTaskPageObject extends BasePageObject {
 
     public void submitTaskExpectingFailure(){
         driver.findElement(createButton).click();
+    }
+
+    public String getAlertMessage(){
+        final Alert alert = new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(ExpectedConditions.alertIsPresent());
+        return alert.getText();
     }
 
     public String getErrorMessage(){
