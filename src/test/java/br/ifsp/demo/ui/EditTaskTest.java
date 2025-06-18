@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -39,7 +38,7 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(300))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.getCreateTaskLocator()));
 
         var createTaskPage = taskListPage.navigateToCreateTaskPage();
 
@@ -47,7 +46,7 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(createTaskPage.byCreateButton()));
+                .until(ExpectedConditions.elementToBeClickable(createTaskPage.getCreateButtonLocator()));
 
         String title = faker.name().title();
         createTaskPage.fillTaskTitle(title);
@@ -71,7 +70,7 @@ public class EditTaskTest extends BaseSeleniumTest {
             .withTimeout(Duration.ofSeconds(5))
             .pollingEvery(Duration.ofMillis(500))
             .ignoring(NoSuchElementException.class)
-            .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+            .until(ExpectedConditions.elementToBeClickable(taskListPage.getCreateTaskLocator()));
 
         var taskPage = taskListPage.navigateToTaskPage(title);
 
@@ -79,9 +78,9 @@ public class EditTaskTest extends BaseSeleniumTest {
             .withTimeout(Duration.ofSeconds(5))
             .pollingEvery(Duration.ofMillis(500))
             .ignoring(NoSuchElementException.class)
-            .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
+            .until(ExpectedConditions.presenceOfElementLocated(taskPage.getTaskTitleLocator()));
 
-        EditTaskPageObject editTaskPageObject = taskPage.editTask();
+        EditTaskPageObject editTaskPageObject = taskPage.navigateToEditPage();
 
         String newTaskTitle = faker.name().title();
         Date newFutureDate = faker.date().future(365, TimeUnit.DAYS);
@@ -119,7 +118,7 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(300))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.getCreateTaskLocator()));
 
         var createTaskPage = taskListPage.navigateToCreateTaskPage();
 
@@ -127,7 +126,7 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(createTaskPage.byCreateButton()));
+                .until(ExpectedConditions.elementToBeClickable(createTaskPage.getCreateButtonLocator()));
 
         String title = faker.name().title();
         createTaskPage.fillTaskTitle(title);
@@ -151,7 +150,7 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.getCreateTaskLocator()));
 
         var taskPage = taskListPage.navigateToTaskPage(title);
 
@@ -159,9 +158,9 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.getTaskTitleLocator()));
 
-        EditTaskPageObject editTaskPageObject = taskPage.editTask();
+        EditTaskPageObject editTaskPageObject = taskPage.navigateToEditPage();
 
         String newDescription = faker.lorem().sentence(3);
         Date newFutureDate = faker.date().future(365, TimeUnit.DAYS);
@@ -199,7 +198,7 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(300))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.getCreateTaskLocator()));
 
         var createTaskPage = taskListPage.navigateToCreateTaskPage();
 
@@ -207,7 +206,7 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(createTaskPage.byCreateButton()));
+                .until(ExpectedConditions.elementToBeClickable(createTaskPage.getCreateButtonLocator()));
 
         String title = faker.name().title();
         createTaskPage.fillTaskTitle(title);
@@ -231,7 +230,7 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.getCreateTaskLocator()));
 
         var taskPage = taskListPage.navigateToTaskPage(title);
 
@@ -239,9 +238,9 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.getTaskTitleLocator()));
 
-        EditTaskPageObject editTaskPageObject = taskPage.editTask();
+        EditTaskPageObject editTaskPageObject = taskPage.navigateToEditPage();
 
         String newTaskTitle = faker.name().title();
         Date newFutureDate = faker.date().future(365, TimeUnit.DAYS);
@@ -279,7 +278,7 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(300))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.getCreateTaskLocator()));
 
         var createTaskPage = taskListPage.navigateToCreateTaskPage();
 
@@ -287,7 +286,7 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(createTaskPage.byCreateButton()));
+                .until(ExpectedConditions.elementToBeClickable(createTaskPage.getCreateButtonLocator()));
 
         String title = faker.name().title();
         createTaskPage.fillTaskTitle(title);
@@ -311,7 +310,7 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.getCreateTaskLocator()));
 
         var taskPage = taskListPage.navigateToTaskPage(title);
 
@@ -319,9 +318,9 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.getTaskTitleLocator()));
 
-        EditTaskPageObject editTaskPageObject = taskPage.editTask();
+        EditTaskPageObject editTaskPageObject = taskPage.navigateToEditPage();
 
         String newTaskTitle = faker.name().title();
         String newDescription = faker.lorem().sentence(3);
@@ -354,7 +353,7 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(300))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.getCreateTaskLocator()));
 
         var createTaskPage = taskListPage.navigateToCreateTaskPage();
 
@@ -362,7 +361,7 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(createTaskPage.byCreateButton()));
+                .until(ExpectedConditions.elementToBeClickable(createTaskPage.getCreateButtonLocator()));
 
         String title = faker.name().title();
         createTaskPage.fillTaskTitle(title);
@@ -386,7 +385,7 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.elementToBeClickable(taskListPage.byCreateTask()));
+                .until(ExpectedConditions.elementToBeClickable(taskListPage.getCreateTaskLocator()));
 
         var taskPage = taskListPage.navigateToTaskPage(title);
 
@@ -394,9 +393,9 @@ public class EditTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.getTaskTitleLocator()));
 
-        EditTaskPageObject editTaskPageObject = taskPage.editTask();
+        EditTaskPageObject editTaskPageObject = taskPage.navigateToEditPage();
 
         String newTaskTitle = faker.name().title();
         String newDescription = faker.lorem().sentence(3);

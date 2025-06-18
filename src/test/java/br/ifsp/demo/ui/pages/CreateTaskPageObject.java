@@ -18,7 +18,7 @@ public class CreateTaskPageObject extends BasePageObject {
 
     private final By createButton = By.id("create-task-btn");
 
-    public By byCreateButton(){
+    public By getCreateButtonLocator(){
         return createButton;
     }
 

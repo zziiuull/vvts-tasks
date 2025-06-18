@@ -17,7 +17,7 @@ public class TaskPageObject extends BasePageObject {
 
     private final By taskTitle = By.cssSelector("#task-container h3");
 
-    public By byTaskTitle() {
+    public By getTaskTitleLocator() {
         return taskTitle;
     }
 
@@ -37,7 +37,7 @@ public class TaskPageObject extends BasePageObject {
         return driver.findElement(By.cssSelector("#task-container p:nth-of-type(3)")).getText();
     }
 
-    public EditTaskPageObject editTask(){
+    public EditTaskPageObject navigateToEditPage(){
         driver.findElement(By.id("edit-task-btn")).click();
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
