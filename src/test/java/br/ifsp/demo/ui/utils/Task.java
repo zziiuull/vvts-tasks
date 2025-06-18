@@ -24,6 +24,6 @@ public class Task {
         createTaskPageObject.fillTaskDescription(description);
         createTaskPageObject.fillTaskDeadline(date, time);
 
-        return createTaskPageObject.submitTask();
+        return createTaskPageObject.submitTaskExpectingSuccess();
     }
 }

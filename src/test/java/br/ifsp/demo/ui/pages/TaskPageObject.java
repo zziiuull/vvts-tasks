@@ -18,7 +18,7 @@ public class TaskPageObject extends BasePageObject {
     private final By taskTitle = By.cssSelector("#task-container h3");
     private final By errorMessage = By.id("error-message");
 
-    public By byTaskTitle() {
+    public By getTaskTitleLocator() {
         return taskTitle;
     }
 
@@ -54,7 +54,7 @@ public class TaskPageObject extends BasePageObject {
         return driver.findElement(errorMessage).getText();
     }
 
-    public EditTaskPageObject editTask(){
+    public EditTaskPageObject navigateToEditPage(){
         driver.findElement(By.id("edit-task-btn")).click();
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))

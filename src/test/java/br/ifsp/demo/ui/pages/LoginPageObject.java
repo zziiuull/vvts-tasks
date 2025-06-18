@@ -24,7 +24,7 @@ public class LoginPageObject extends BasePageObject {
     private final By registerButton = By.id("toRegisterBtn");
     private final By errorMessage = By.id("errorMessage");
 
-    public By byUsernameField() {
+    public By getUsernameFieldLocator() {
         return usernameField;
     }
 
@@ -38,7 +38,7 @@ public class LoginPageObject extends BasePageObject {
         driver.findElement(passwordField).sendKeys(password);
     }
 
-    public TaskListPageObject login() {
+    public TaskListPageObject clickLoginExpectingSuccess() {
         driver.findElement(loginButton).click();
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
@@ -47,7 +47,7 @@ public class LoginPageObject extends BasePageObject {
         return new TaskListPageObject(driver);
     }
 
-    public void loginWithFailure(){
+    public void clickLoginExpectingFailure(){
         driver.findElement(loginButton).click();
     }
 

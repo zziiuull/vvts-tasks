@@ -19,7 +19,7 @@ public class TaskListPageObject extends BasePageObject {
 
     private final By createTask = By.id("add-task-btn");
 
-    public By byCreateTask(){
+    public By getCreateTaskLocator(){
         return createTask;
     }
 

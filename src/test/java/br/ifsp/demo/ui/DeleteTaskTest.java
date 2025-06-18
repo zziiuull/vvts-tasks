@@ -47,7 +47,7 @@ public class DeleteTaskTest extends BaseSeleniumTest {
         String time = futureDateTime.format(timeFormatter);
         createTaskPage.fillTaskDeadline(date, time);
 
-        taskListPage = createTaskPage.submitTask();
+        taskListPage = createTaskPage.submitTaskExpectingSuccess();
 
         var taskPage = taskListPage.navigateToTaskPage(title);
 

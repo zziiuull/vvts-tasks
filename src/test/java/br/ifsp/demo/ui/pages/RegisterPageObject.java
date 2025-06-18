@@ -4,6 +4,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
@@ -12,6 +13,8 @@ public class RegisterPageObject extends BasePageObject {
 
     public RegisterPageObject(WebDriver driver) {
         super(driver);
+        new WebDriverWait(driver, Duration.ofSeconds(3))
+                .until(ExpectedConditions.presenceOfElementLocated(By.id("registerForm")));
         if (!PAGE_TITLE.equals(pageTitle())) throw new IllegalStateException("Wrong page url: " + driver.getCurrentUrl());
     }
 
@@ -21,7 +24,7 @@ public class RegisterPageObject extends BasePageObject {
     private final By passwordField = By.id("password");
     private final By registerButton = By.cssSelector("button[type='submit']");
 
-    public By registerButton() {
+    public By getRegisterButtonLocator() {
         return registerButton;
     }
 
@@ -41,7 +44,23 @@ public class RegisterPageObject extends BasePageObject {
         driver.findElement(passwordField).sendKeys(password);
     }
 
-    public LoginPageObject clickRegister() {
+    public String getNameError() {
+        return driver.findElement(By.id("name-error")).getText();
+    }
+
+    public String getLastNameError() {
+        return driver.findElement(By.id("lastname-error")).getText();
+    }
+
+    public String getEmailError() {
+        return driver.findElement(By.id("email-error")).getText();
+    }
+
+    public String getPasswordError() {
+        return driver.findElement(By.id("password-error")).getText();
+    }
+
+    public LoginPageObject clickRegisterExpectingSuccess() {
         driver.findElement(registerButton).click();
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
@@ -49,4 +68,9 @@ public class RegisterPageObject extends BasePageObject {
                 .until(ExpectedConditions.titleIs(LoginPageObject.PAGE_TITLE));
         return new LoginPageObject(driver);
     }
+
+    public void clickRegisterExpectingFailure() {
+        driver.findElement(registerButton).click();
+    }
+
 }

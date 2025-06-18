@@ -1,10 +1,9 @@
 package br.ifsp.demo.ui.pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
@@ -18,7 +17,7 @@ public class CreateTaskPageObject extends BasePageObject {
 
     private final By createButton = By.id("create-task-btn");
 
-    public By byCreateButton(){
+    public By getCreateButtonLocator(){
         return createButton;
     }
 
@@ -39,13 +38,23 @@ public class CreateTaskPageObject extends BasePageObject {
         deadline.sendKeys(time);
     }
 
-    public TaskListPageObject submitTask() {
+    public TaskListPageObject submitTaskExpectingSuccess() {
         driver.findElement(createButton).click();
         new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(300))
                 .until(ExpectedConditions.titleIs(TaskListPageObject.PAGE_TITLE));
         return new TaskListPageObject(driver);
+    }
+
+    public void submitTaskExpectingFailure(){
+        driver.findElement(createButton).click();
+    }
+
+    public String getAlertMessage(){
+        final Alert alert = new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(ExpectedConditions.alertIsPresent());
+        return alert.getText();
     }
 
     public String getErrorMessage(){

@@ -53,7 +53,7 @@ public class ClockInTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.getTaskTitleLocator()));
 
         taskPage = taskPage.clockIn();
 
@@ -66,7 +66,7 @@ public class ClockInTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.getTaskTitleLocator()));
 
         String taskStatusClockIn = taskPage.getTaskStatus();
 
@@ -81,7 +81,7 @@ public class ClockInTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.getTaskTitleLocator()));
 
         String taskStatusClockOut = taskPage.getTaskStatus();
 
@@ -90,7 +90,7 @@ public class ClockInTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.getTaskTitleLocator()));
 
         assertThat(taskPage.getTaskTitle()).isEqualTo(title);
         assertThat(taskPage.getTaskDescription()).isEqualTo(description);
@@ -127,7 +127,7 @@ public class ClockInTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.getTaskTitleLocator()));
 
         taskPage = taskPage.clockIn();
 
@@ -140,7 +140,7 @@ public class ClockInTaskTest extends BaseSeleniumTest {
                 .withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(500))
                 .ignoring(NoSuchElementException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(taskPage.byTaskTitle()));
+                .until(ExpectedConditions.presenceOfElementLocated(taskPage.getTaskTitleLocator()));
 
         String taskStatusClockIn = taskPage.getTaskStatus();
 
