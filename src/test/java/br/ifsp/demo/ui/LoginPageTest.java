@@ -1,6 +1,7 @@
 package br.ifsp.demo.ui;
 
 import br.ifsp.demo.ui.pages.LoginPageObject;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.openqa.selenium.JavascriptExecutor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
 class LoginPageTest extends BaseSeleniumTest {
 
     private LoginPageObject loginPage;
@@ -185,5 +187,16 @@ class LoginPageTest extends BaseSeleniumTest {
 
         String error = loginPage.waitForErrorMessage();
         assertThat(error).contains("incorrect");
+    }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should login with complex password characters")
+    void shouldLoginWithComplexPasswordCharacters() {
+        loginPage.fillUsername("valid.user@ifsp.edu.br");
+        loginPage.fillPassword("!@#$%^&*()_+Aa1");
+        loginPage.clickLoginExpectingSuccess();
+
+        assertThat(driver.getCurrentUrl()).contains("tasklist.html");
     }
 }
