@@ -159,4 +159,17 @@ class LoginPageTest extends BaseSeleniumTest {
 
         assertThat(token).isNotBlank();
     }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should not allow access to register page after login")
+    void shouldNotAllowAccessToRegisterPageAfterLogin() {
+        loginPage.fillUsername("valid.user@ifsp.edu.br");
+        loginPage.fillPassword("validPass123");
+        loginPage.clickLoginExpectingSuccess();
+
+        driver.get("http://localhost:8081/register.html");
+
+        assertThat(driver.getCurrentUrl()).doesNotContain("register.html");
+    }
 }
