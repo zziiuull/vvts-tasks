@@ -8,6 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -143,5 +144,19 @@ class LoginPageTest extends BaseSeleniumTest {
         loginPage.clickLoginExpectingSuccess();
 
         assertThat(driver.getCurrentUrl()).contains("tasklist.html");
+    }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should store token in localStorage after login")
+    void shouldStoreTokenInLocalStorageAfterLogin() {
+        loginPage.fillUsername("valid.user@ifsp.edu.br");
+        loginPage.fillPassword("validPass123");
+        loginPage.clickLoginExpectingSuccess();
+
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        String token = (String) js.executeScript("return localStorage.getItem('tokenTaskVVTS');");
+
+        assertThat(token).isNotBlank();
     }
 }
