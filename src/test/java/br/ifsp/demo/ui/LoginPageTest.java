@@ -134,4 +134,14 @@ class LoginPageTest extends BaseSeleniumTest {
         assertThat(driver.getCurrentUrl()).contains("tasklist.html");
     }
 
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should allow login with email using uppercase letters")
+    void shouldAllowLoginWithEmailUsingUppercaseLetters() {
+        loginPage.fillUsername("VALID.USER@IFSP.EDU.BR");
+        loginPage.fillPassword("validPass123");
+        loginPage.clickLoginExpectingSuccess();
+
+        assertThat(driver.getCurrentUrl()).contains("tasklist.html");
+    }
 }
