@@ -172,4 +172,18 @@ class LoginPageTest extends BaseSeleniumTest {
 
         assertThat(driver.getCurrentUrl()).doesNotContain("register.html");
     }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should reject SQL Injection during login")
+    void shouldRejectSqlInjectionDuringLogin() {
+        String sqlInjection = "' OR '1'='1";
+
+        loginPage.fillUsername(sqlInjection);
+        loginPage.fillPassword(sqlInjection);
+        loginPage.clickLoginExpectingFailure();
+
+        String error = loginPage.waitForErrorMessage();
+        assertThat(error).contains("incorrect");
+    }
 }
