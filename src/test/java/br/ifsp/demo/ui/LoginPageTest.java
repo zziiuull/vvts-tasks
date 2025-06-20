@@ -123,4 +123,15 @@ class LoginPageTest extends BaseSeleniumTest {
         assertThat(error).contains("Username or password is incorrect.");
     }
 
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should login successfully with email and password containing spaces")
+    void shouldLoginSuccessfullyWithEmailAndPasswordContainingSpaces() {
+        loginPage.fillUsername("    valid.user@ifsp.edu.br  ");
+        loginPage.fillPassword("    validPass123    ");
+        loginPage.clickLoginExpectingSuccess();
+
+        assertThat(driver.getCurrentUrl()).contains("tasklist.html");
+    }
+
 }
