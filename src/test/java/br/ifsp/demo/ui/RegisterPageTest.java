@@ -172,6 +172,8 @@ class RegisterPageTest extends BaseSeleniumTest {
         registerPage.fillEmail(email);
         registerPage.fillPassword(password);
 
+        registerPage.clickRegisterExpectingSuccess();
+
         registerPage.clickRegisterExpectingFailure();
 
         String error = driver.findElement(By.id("errorMessage")).getText();
