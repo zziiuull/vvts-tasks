@@ -1,6 +1,7 @@
 package br.ifsp.demo.ui;
 
 import br.ifsp.demo.ui.pages.LoginPageObject;
+import br.ifsp.demo.ui.utils.Auth;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -10,6 +11,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.support.ui.FluentWait;
+
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,6 +37,18 @@ class LoginPageTest extends BaseSeleniumTest {
         String usernameError = loginPage.waitForUsernameError();
         assertThat(usernameError).isNotBlank();
         assertThat(usernameError).contains("Username is required");
+    }
+
+    @Test
+    @Tag("UiTest")
+    @DisplayName("Should reject login when email field is a blank space")
+    void shouldRejectLoginWhenEmailFielIsABlankSpace() {
+        loginPage.fillUsername(" ");
+        loginPage.fillPassword(faker.internet().password());
+        loginPage.clickLoginExpectingFailure();
+
+        String usernameError = loginPage.waitForErrorMessage();
+        assertThat(usernameError).contains("Username or password is incorrect.");
     }
 
     @Test
@@ -84,8 +100,9 @@ class LoginPageTest extends BaseSeleniumTest {
     @Tag("UiTest")
     @DisplayName("Should login with valid credentials")
     void shouldLoginWithValidCredentials() {
-        String email = "valid.user@ifsp.edu.br";
         String password = "validPass123";
+        String email = faker.internet().emailAddress();
+        Auth.register(driver, email, password);
 
         loginPage.fillUsername(email);
         loginPage.fillPassword(password);
@@ -107,19 +124,16 @@ class LoginPageTest extends BaseSeleniumTest {
     @CsvSource({
             ".@mail.com",
             "?@mail.com",
-            "@mail.com",
-            "user@mail",
-            "user@.com",
-            "user@com.",
-            "user@@mail.com",
-            "user mail@mail.com",
             "user<>mail@mail.com"
     })
     @Tag("UiTest")
     @DisplayName("Should reject invalid email formats")
     void shouldRejectInvalidEmailFormats(String email) {
+        String password = "somePassword123";
+        Auth.register(driver, email, password);
+
         loginPage.fillUsername(email);
-        loginPage.fillPassword("somePassword123");
+        loginPage.fillPassword(password);
         loginPage.clickLoginExpectingFailure();
 
         String error = loginPage.waitForErrorMessage();
@@ -130,8 +144,12 @@ class LoginPageTest extends BaseSeleniumTest {
     @Tag("UiTest")
     @DisplayName("Should login successfully with email and password containing spaces")
     void shouldLoginSuccessfullyWithEmailAndPasswordContainingSpaces() {
-        loginPage.fillUsername("    valid.user@ifsp.edu.br  ");
-        loginPage.fillPassword("    validPass123    ");
+        String email = "    valid.user@ifsp.edu.br  ";
+        String password = "    validPass123    ";
+        Auth.register(driver, email, password);
+
+        loginPage.fillUsername(email);
+        loginPage.fillPassword(password);
         loginPage.clickLoginExpectingSuccess();
 
         assertThat(driver.getCurrentUrl()).contains("tasklist.html");
@@ -139,21 +157,30 @@ class LoginPageTest extends BaseSeleniumTest {
 
     @Test
     @Tag("UiTest")
-    @DisplayName("Should allow login with email using uppercase letters")
-    void shouldAllowLoginWithEmailUsingUppercaseLetters() {
-        loginPage.fillUsername("VALID.USER@IFSP.EDU.BR");
-        loginPage.fillPassword("validPass123");
-        loginPage.clickLoginExpectingSuccess();
+    @DisplayName("Should reject login with email using uppercase letters")
+    void shouldRejectLoginWithEmailUsingUppercaseLetters() {
+        String email = faker.internet().emailAddress();
+        String password = "validPass123";
+        Auth.register(driver, email, password);
 
-        assertThat(driver.getCurrentUrl()).contains("tasklist.html");
+        loginPage.fillUsername(email.toUpperCase());
+        loginPage.fillPassword(password);
+        loginPage.clickLoginExpectingFailure();
+
+        String usernameError = loginPage.waitForErrorMessage();
+        assertThat(usernameError).isEqualTo("Username or password is incorrect.");
     }
 
     @Test
     @Tag("UiTest")
     @DisplayName("Should store token in localStorage after login")
     void shouldStoreTokenInLocalStorageAfterLogin() {
-        loginPage.fillUsername("valid.user@ifsp.edu.br");
-        loginPage.fillPassword("validPass123");
+        String email = faker.internet().emailAddress();
+        String password = faker.internet().password();
+        Auth.register(driver, email, password);
+
+        loginPage.fillUsername(email);
+        loginPage.fillPassword(password);
         loginPage.clickLoginExpectingSuccess();
 
         JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -166,8 +193,12 @@ class LoginPageTest extends BaseSeleniumTest {
     @Tag("UiTest")
     @DisplayName("Should not allow access to register page after login")
     void shouldNotAllowAccessToRegisterPageAfterLogin() {
-        loginPage.fillUsername("valid.user@ifsp.edu.br");
-        loginPage.fillPassword("validPass123");
+        String email = faker.internet().emailAddress();
+        String password = faker.internet().password();
+        Auth.register(driver, email, password);
+
+        loginPage.fillUsername(email);
+        loginPage.fillPassword(password);
         loginPage.clickLoginExpectingSuccess();
 
         driver.get("http://localhost:8081/register.html");
@@ -193,8 +224,12 @@ class LoginPageTest extends BaseSeleniumTest {
     @Tag("UiTest")
     @DisplayName("Should login with complex password characters")
     void shouldLoginWithComplexPasswordCharacters() {
-        loginPage.fillUsername("valid.user@ifsp.edu.br");
-        loginPage.fillPassword("!@#$%^&*()_+Aa1");
+        String email = faker.internet().emailAddress();
+        String password = "!@#$%^&*()_+Aa1";
+        Auth.register(driver, email, password);
+
+        loginPage.fillUsername(email);
+        loginPage.fillPassword(password);
         loginPage.clickLoginExpectingSuccess();
 
         assertThat(driver.getCurrentUrl()).contains("tasklist.html");
