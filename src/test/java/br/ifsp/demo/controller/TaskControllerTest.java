@@ -612,6 +612,43 @@ class TaskControllerTest extends BaseApiIntegrationTest {
         }
 
         @Nested
+        @DisplayName("403 forbidden")
+        class Forbidden {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return a forbidden status code when deleting a task that belongs to another user")
+            void shouldReturnAForbiddenStatusCodeWhenDeletingATaskThatBelongsToAnotherUser() {
+                String passA = "123";
+                User userA = registerUser(passA);
+                String tokenA = authenticate(userA.getEmail(), passA);
+
+                String passB = "456";
+                User userB = registerUser(passB);
+                String tokenB = authenticate(userB.getEmail(), passB);
+
+                CreateTaskDTO dto = EntityBuilder.createRandomCreateTaskDTO();
+                ResponseTaskDTO taskCreated =
+                        given().contentType("application/json")
+                                .header("Authorization", "Bearer " + tokenA)
+                                .body(dto)
+                                .when().post("/api/v1/task/create")
+                                .then().statusCode(HttpStatus.CREATED.value())
+                                .extract().as(ResponseTaskDTO.class);
+
+                given()
+                        .port(RestAssured.port)
+                        .header("Authorization", "Bearer " + tokenB)
+                        .when()
+                        .delete("api/v1/task/delete/" + taskCreated.id())
+                        .then()
+                        .log()
+                        .ifValidationFails(LogDetail.BODY)
+                        .statusCode(HttpStatus.FORBIDDEN.value());
+            }
+        }
+
+        @Nested
         @DisplayName("404 not found")
         class NotFound {
             @Test
@@ -639,283 +676,328 @@ class TaskControllerTest extends BaseApiIntegrationTest {
     @Nested
     @DisplayName("PUT /mark-completed/{id}")
     class MarkCompletedTests {
+        @Nested
+        @DisplayName("204 no content")
+        class NoContent {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should mark a task as completed and return 204")
+            void shouldMarkATaskAsCompletedAndReturn204() {
+                CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
 
-        @Test
-        @Tag("ApiTest")
-        @Tag("IntegrationTest")
-        @DisplayName("Should mark a task as completed and return 204")
-        void shouldMarkATaskAsCompletedAndReturn204() {
-            CreateTaskDTO createTaskDTO = EntityBuilder.createRandomCreateTaskDTO();
+                final ResponseTaskDTO response =
+                        given().contentType("application/json")
+                            .header("Authorization", authorizationHeader)
+                            .body(createTaskDTO)
+                        .when()
+                            .post("/api/v1/task/create")
+                        .then()
+                            .statusCode(HttpStatus.CREATED.value())
+                            .extract()
+                            .as(ResponseTaskDTO.class);
 
-            final ResponseTaskDTO response =
-                    given().contentType("application/json")
-                        .header("Authorization", authorizationHeader)
-                        .body(createTaskDTO)
+                given().header("Authorization", authorizationHeader)
                     .when()
-                        .post("/api/v1/task/create")
+                    .put("/api/v1/task/mark-completed/" + response.id())
                     .then()
-                        .statusCode(HttpStatus.CREATED.value())
-                        .extract()
-                        .as(ResponseTaskDTO.class);
+                    .statusCode(HttpStatus.NO_CONTENT.value());
 
-            given().header("Authorization", authorizationHeader)
-                .when()
-                .put("/api/v1/task/mark-completed/" + response.id())
-                .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
-
-            TaskEntity updated = taskRepository.findById(response.id()).orElseThrow();
-            assertThat(updated.getStatus().name()).isEqualTo("COMPLETED");
+                TaskEntity updated = taskRepository.findById(response.id()).orElseThrow();
+                assertThat(updated.getStatus().name()).isEqualTo("COMPLETED");
+            }
         }
 
-        @Test
-        @Tag("ApiTest")
-        @Tag("IntegrationTest")
-        @DisplayName("Should return 404 if task does not exist")
-        void shouldReturn404IfTaskDoesNotExist() {
-            UUID randomId = UUID.randomUUID();
+        @Nested
+        @DisplayName("404 not found")
+        class NotFound {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return 404 if task does not exist")
+            void shouldReturn404IfTaskDoesNotExist() {
+                UUID randomId = UUID.randomUUID();
 
-            given().header("Authorization", authorizationHeader)
-                .when()
-                .put("/api/v1/task/mark-completed/" + randomId)
-                .then()
-                .statusCode(HttpStatus.NOT_FOUND.value());
+                given().header("Authorization", authorizationHeader)
+                        .when()
+                        .put("/api/v1/task/mark-completed/" + randomId)
+                        .then()
+                        .statusCode(HttpStatus.NOT_FOUND.value());
+            }
         }
 
-        @Test
-        @Tag("ApiTest")
-        @Tag("IntegrationTest")
-        @DisplayName("Should return 403 if task belongs to another user")
-        void shouldReturn403IfNotOwner() {
-            String passA = "123";
-            User userA = registerUser(passA);
-            String tokenA = authenticate(userA.getEmail(), passA);
+        @Nested
+        @DisplayName("403 forbidden")
+        class Forbidden {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return 403 if task belongs to another user")
+            void shouldReturn403IfNotOwner() {
+                String passA = "123";
+                User userA = registerUser(passA);
+                String tokenA = authenticate(userA.getEmail(), passA);
 
-            String passB = "456";
-            User userB = registerUser(passB);
-            String tokenB = authenticate(userB.getEmail(), passB);
+                String passB = "456";
+                User userB = registerUser(passB);
+                String tokenB = authenticate(userB.getEmail(), passB);
 
-            CreateTaskDTO dto = EntityBuilder.createRandomCreateTaskDTO();
-            ResponseTaskDTO taskCreated =
-                    given().contentType("application/json")
-                        .header("Authorization", "Bearer " + tokenA)
-                        .body(dto)
-                    .when().post("/api/v1/task/create")
-                    .then().statusCode(HttpStatus.CREATED.value())
-                    .extract().as(ResponseTaskDTO.class);
+                CreateTaskDTO dto = EntityBuilder.createRandomCreateTaskDTO();
+                ResponseTaskDTO taskCreated =
+                        given().contentType("application/json")
+                            .header("Authorization", "Bearer " + tokenA)
+                            .body(dto)
+                        .when().post("/api/v1/task/create")
+                        .then().statusCode(HttpStatus.CREATED.value())
+                        .extract().as(ResponseTaskDTO.class);
 
-            given().header("Authorization", "Bearer " + tokenB)
-                .when().put("/api/v1/task/mark-completed/" + taskCreated.id())
-                .then().statusCode(HttpStatus.FORBIDDEN.value());
+                given().header("Authorization", "Bearer " + tokenB)
+                    .when().put("/api/v1/task/mark-completed/" + taskCreated.id())
+                    .then().statusCode(HttpStatus.FORBIDDEN.value());
+            }
         }
     }
 
     @Nested
     @DisplayName("PUT /clock-in/{id}")
     class ClockInTests {
+        @Nested
+        @DisplayName("204 no content")
+        class NoContent {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should clock-in task and return 204")
+            void shouldClockInTaskAndReturn204() {
+                CreateTaskDTO dto = EntityBuilder.createRandomCreateTaskDTO();
 
-        @Test
-        @Tag("ApiTest")
-        @Tag("IntegrationTest")
-        @DisplayName("Should clock-in task and return 204")
-        void shouldClockInTaskAndReturn204() {
-            CreateTaskDTO dto = EntityBuilder.createRandomCreateTaskDTO();
+                ResponseTaskDTO createdTask =
+                    given().contentType("application/json")
+                        .header("Authorization", authorizationHeader)
+                        .body(dto)
+                    .when().post("/api/v1/task/create")
+                    .then().statusCode(HttpStatus.CREATED.value())
+                    .extract().as(ResponseTaskDTO.class);
 
-            ResponseTaskDTO createdTask =
-                given().contentType("application/json")
-                    .header("Authorization", authorizationHeader)
-                    .body(dto)
-                .when().post("/api/v1/task/create")
-                .then().statusCode(HttpStatus.CREATED.value())
-                .extract().as(ResponseTaskDTO.class);
+                given().header("Authorization", authorizationHeader)
+                    .when().put("/api/v1/task/clock-in/" + createdTask.id())
+                    .then().statusCode(HttpStatus.NO_CONTENT.value());
 
-            given().header("Authorization", authorizationHeader)
-                .when().put("/api/v1/task/clock-in/" + createdTask.id())
-                .then().statusCode(HttpStatus.NO_CONTENT.value());
-
-            TaskEntity updated = taskRepository.findById(createdTask.id()).orElseThrow();
-            assertThat(updated.getStartTime()).isNotNull();
+                TaskEntity updated = taskRepository.findById(createdTask.id()).orElseThrow();
+                assertThat(updated.getStartTime()).isNotNull();
+            }
         }
 
-        @Test
-        @Tag("ApiTest")
-        @Tag("IntegrationTest")
-        @DisplayName("Should return 404 when task does not exist")
-        void shouldReturn404WhenTaskDoesNotExist() {
-            UUID nonExistentId = UUID.randomUUID();
+        @Nested
+        @DisplayName("403 forbidden")
+        class Forbidden {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return 403 if task does not belong to user")
+            void shouldReturn403IfTaskDoesNotBelongToUser() {
+                User userA = registerUser("123");
+                String tokenA = authenticate(userA.getEmail(), "123");
 
-            given().header("Authorization", authorizationHeader)
-                .when().put("/api/v1/task/clock-in/" + nonExistentId)
-                .then().statusCode(HttpStatus.NOT_FOUND.value());
+                User userB = registerUser("456");
+                String tokenB = authenticate(userB.getEmail(), "456");
+
+                ResponseTaskDTO taskFromA =
+                        given().contentType("application/json")
+                                .header("Authorization", "Bearer " + tokenA)
+                                .body(EntityBuilder.createRandomCreateTaskDTO())
+                                .when().post("/api/v1/task/create")
+                                .then().statusCode(HttpStatus.CREATED.value())
+                                .extract().as(ResponseTaskDTO.class);
+
+                given().header("Authorization", "Bearer " + tokenB)
+                        .when().put("/api/v1/task/clock-in/" + taskFromA.id())
+                        .then().statusCode(HttpStatus.FORBIDDEN.value());
+            }
         }
 
-        @Test
-        @Tag("ApiTest")
-        @Tag("IntegrationTest")
-        @DisplayName("Should return 403 if task does not belong to user")
-        void shouldReturn403IfTaskDoesNotBelongToUser() {
-            User userA = registerUser("123");
-            String tokenA = authenticate(userA.getEmail(), "123");
+        @Nested
+        @DisplayName("404 not found")
+        class NotFound {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return 404 when task does not exist")
+            void shouldReturn404WhenTaskDoesNotExist() {
+                UUID nonExistentId = UUID.randomUUID();
 
-            User userB = registerUser("456");
-            String tokenB = authenticate(userB.getEmail(), "456");
-
-            ResponseTaskDTO taskFromA =
-                given().contentType("application/json")
-                    .header("Authorization", "Bearer " + tokenA)
-                    .body(EntityBuilder.createRandomCreateTaskDTO())
-                .when().post("/api/v1/task/create")
-                .then().statusCode(HttpStatus.CREATED.value())
-                .extract().as(ResponseTaskDTO.class);
-
-            given().header("Authorization", "Bearer " + tokenB)
-                .when().put("/api/v1/task/clock-in/" + taskFromA.id())
-                .then().statusCode(HttpStatus.FORBIDDEN.value());
+                given().header("Authorization", authorizationHeader)
+                    .when().put("/api/v1/task/clock-in/" + nonExistentId)
+                    .then().statusCode(HttpStatus.NOT_FOUND.value());
+            }
         }
     }
 
     @Nested
     @DisplayName("PUT /clock-out/{id}")
     class ClockOutTests {
-
-        @Test
-        @Tag("ApiTest")
-        @Tag("IntegrationTest")
-        @DisplayName("Should clock-out task and return 204")
-        void shouldClockOutTaskAndReturn204() {
-            CreateTaskDTO dto = EntityBuilder.createRandomCreateTaskDTO();
-            ResponseTaskDTO createdTask =
-                given().contentType("application/json")
-                    .header("Authorization", authorizationHeader)
-                    .body(dto)
-                .when().post("/api/v1/task/create")
-                .then().statusCode(HttpStatus.CREATED.value())
-                .extract().as(ResponseTaskDTO.class);
-
-            given().header("Authorization", authorizationHeader)
-                .when().put("/api/v1/task/clock-in/" + createdTask.id())
-                .then().statusCode(HttpStatus.NO_CONTENT.value());
-
-            given().header("Authorization", authorizationHeader)
-                .when().put("/api/v1/task/clock-out/" + createdTask.id())
-                .then().statusCode(HttpStatus.NO_CONTENT.value());
-
-            TaskEntity updated = taskRepository.findById(createdTask.id()).orElseThrow();
-            assertThat(updated.getFinishTime()).isNotNull();
-        }
-
-        @Test
-        @Tag("ApiTest")
-        @Tag("IntegrationTest")
-        @DisplayName("Should return 404 if task not found")
-        void shouldReturn404IfTaskNotFound() {
-            UUID fakeId = UUID.randomUUID();
-
-            given().header("Authorization", authorizationHeader)
-                .when().put("/api/v1/task/clock-out/" + fakeId)
-                .then().statusCode(HttpStatus.NOT_FOUND.value());
-        }
-
-        @Test
-        @Tag("ApiTest")
-        @Tag("IntegrationTest")
-        @DisplayName("Should return 403 if task does not belong to user when clock-out")
-        void shouldReturn403IfTaskDoesNotBelongToUserWhenClockOut() {
-            User userA = registerUser("123");
-            String tokenA = authenticate(userA.getEmail(), "123");
-
-            User userB = registerUser("456");
-            String tokenB = authenticate(userB.getEmail(), "456");
-
-            ResponseTaskDTO taskCreated =
-                given().contentType("application/json")
-                    .header("Authorization", "Bearer " + tokenA)
-                    .body(EntityBuilder.createRandomCreateTaskDTO())
+        @Nested
+        @DisplayName("204 no content")
+        class NoContent {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should clock-out task and return 204")
+            void shouldClockOutTaskAndReturn204() {
+                CreateTaskDTO dto = EntityBuilder.createRandomCreateTaskDTO();
+                ResponseTaskDTO createdTask =
+                    given().contentType("application/json")
+                        .header("Authorization", authorizationHeader)
+                        .body(dto)
                     .when().post("/api/v1/task/create")
                     .then().statusCode(HttpStatus.CREATED.value())
                     .extract().as(ResponseTaskDTO.class);
 
-            given().header("Authorization", "Bearer " + tokenA)
-                .when().put("/api/v1/task/clock-in/" + taskCreated.id())
-                .then().statusCode(HttpStatus.NO_CONTENT.value());
+                given().header("Authorization", authorizationHeader)
+                    .when().put("/api/v1/task/clock-in/" + createdTask.id())
+                    .then().statusCode(HttpStatus.NO_CONTENT.value());
 
-            given().header("Authorization", "Bearer " + tokenB)
-                .when().put("/api/v1/task/clock-out/" + taskCreated.id())
-                .then().statusCode(HttpStatus.FORBIDDEN.value());
+                given().header("Authorization", authorizationHeader)
+                    .when().put("/api/v1/task/clock-out/" + createdTask.id())
+                    .then().statusCode(HttpStatus.NO_CONTENT.value());
+
+                TaskEntity updated = taskRepository.findById(createdTask.id()).orElseThrow();
+                assertThat(updated.getFinishTime()).isNotNull();
+            }
+        }
+
+        @Nested
+        @DisplayName("403 forbidden")
+        class Forbidden {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return 403 if task does not belong to user when clock-out")
+            void shouldReturn403IfTaskDoesNotBelongToUserWhenClockOut() {
+                User userA = registerUser("123");
+                String tokenA = authenticate(userA.getEmail(), "123");
+
+                User userB = registerUser("456");
+                String tokenB = authenticate(userB.getEmail(), "456");
+
+                ResponseTaskDTO taskCreated =
+                        given().contentType("application/json")
+                                .header("Authorization", "Bearer " + tokenA)
+                                .body(EntityBuilder.createRandomCreateTaskDTO())
+                                .when().post("/api/v1/task/create")
+                                .then().statusCode(HttpStatus.CREATED.value())
+                                .extract().as(ResponseTaskDTO.class);
+
+                given().header("Authorization", "Bearer " + tokenA)
+                        .when().put("/api/v1/task/clock-in/" + taskCreated.id())
+                        .then().statusCode(HttpStatus.NO_CONTENT.value());
+
+                given().header("Authorization", "Bearer " + tokenB)
+                        .when().put("/api/v1/task/clock-out/" + taskCreated.id())
+                        .then().statusCode(HttpStatus.FORBIDDEN.value());
+            }
+        }
+
+        @Nested
+        @DisplayName("404 not found")
+        class NotFound {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return 404 if task not found")
+            void shouldReturn404IfTaskNotFound() {
+                UUID fakeId = UUID.randomUUID();
+
+                given().header("Authorization", authorizationHeader)
+                    .when().put("/api/v1/task/clock-out/" + fakeId)
+                    .then().statusCode(HttpStatus.NOT_FOUND.value());
+            }
         }
     }
 
     @Nested
     @DisplayName("GET /spent-time/{id}")
     class SpentTimeTests {
-        @Test
-        @Tag("ApiTest")
-        @Tag("IntegrationTest")
-        @DisplayName("Should return spent time of task with 200")
-        void shouldReturnSpentTimeOfTaskWith200() {
-            CreateTaskDTO dto = EntityBuilder.createRandomCreateTaskDTO();
-            ResponseTaskDTO createdTask =
-                given().contentType("application/json")
-                    .header("Authorization", authorizationHeader)
-                    .body(dto)
-                    .when().post("/api/v1/task/create")
-                    .then().statusCode(HttpStatus.CREATED.value())
-                    .extract().as(ResponseTaskDTO.class);
+        @Nested
+        @DisplayName("200 ok")
+        class Ok {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return spent time of task with 200")
+            void shouldReturnSpentTimeOfTaskWith200() {
+                CreateTaskDTO dto = EntityBuilder.createRandomCreateTaskDTO();
+                ResponseTaskDTO createdTask =
+                    given().contentType("application/json")
+                        .header("Authorization", authorizationHeader)
+                        .body(dto)
+                        .when().post("/api/v1/task/create")
+                        .then().statusCode(HttpStatus.CREATED.value())
+                        .extract().as(ResponseTaskDTO.class);
 
-            given().header("Authorization", authorizationHeader)
-                .when().put("/api/v1/task/clock-in/" + createdTask.id())
-                .then().statusCode(HttpStatus.NO_CONTENT.value());
-
-            given().header("Authorization", authorizationHeader)
-                    .when().put("/api/v1/task/clock-out/" + createdTask.id())
+                given().header("Authorization", authorizationHeader)
+                    .when().put("/api/v1/task/clock-in/" + createdTask.id())
                     .then().statusCode(HttpStatus.NO_CONTENT.value());
 
-            final Integer timeSpent =
-                    given().header("Authorization", authorizationHeader)
-                            .when().get("/api/v1/task/spent-time/" + createdTask.id())
-                            .then()
-                            .statusCode(HttpStatus.OK.value())
-                            .extract()
-                            .jsonPath().getInt("status");
+                given().header("Authorization", authorizationHeader)
+                        .when().put("/api/v1/task/clock-out/" + createdTask.id())
+                        .then().statusCode(HttpStatus.NO_CONTENT.value());
 
-            TaskEntity task = taskRepository.findById(createdTask.id()).orElseThrow();
-            assertThat(timeSpent).isEqualTo(task.getTimeSpent().intValue());
+                final Integer timeSpent =
+                        given().header("Authorization", authorizationHeader)
+                                .when().get("/api/v1/task/spent-time/" + createdTask.id())
+                                .then()
+                                .statusCode(HttpStatus.OK.value())
+                                .extract()
+                                .jsonPath().getInt("status");
+
+                TaskEntity task = taskRepository.findById(createdTask.id()).orElseThrow();
+                assertThat(timeSpent).isEqualTo(task.getTimeSpent().intValue());
+            }
         }
 
-        @Test
-        @Tag("ApiTest")
-        @Tag("IntegrationTest")
-        @DisplayName("Should return not found if task does not exist")
-        void shouldReturnNotFoundIfTaskDoesNotExist() {
-            UUID invalidId = UUID.randomUUID();
+        @Nested
+        @DisplayName("403 forbidden")
+        class Forbidden {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return forbidden if user does not own task")
+            void shouldReturnForbiddenIfUserDoesNotOwnTask() {
+                User userA = registerUser("passA");
+                String tokenA = authenticate(userA.getEmail(), "passA");
 
-            given().header("Authorization", authorizationHeader)
-                    .when().get("/api/v1/task/spent-time/" + invalidId)
-                    .then().statusCode(HttpStatus.NOT_FOUND.value());
+                User userB = registerUser("passB");
+                String tokenB = authenticate(userB.getEmail(), "passB");
+
+                ResponseTaskDTO task =
+                    given().contentType("application/json")
+                        .header("Authorization", "Bearer " + tokenA)
+                        .body(EntityBuilder.createRandomCreateTaskDTO())
+                        .when().post("/api/v1/task/create")
+                        .then().statusCode(HttpStatus.CREATED.value())
+                        .extract().as(ResponseTaskDTO.class);
+
+                given().header("Authorization", "Bearer " + tokenB)
+                    .when().get("/api/v1/task/spent-time/" + task.id())
+                    .then().statusCode(HttpStatus.FORBIDDEN.value());
+            }
         }
 
-        @Test
-        @Tag("ApiTest")
-        @Tag("IntegrationTest")
-        @DisplayName("Should return forbidden if user does not own task")
-        void shouldReturnForbiddenIfUserDoesNotOwnTask() {
-            User userA = registerUser("passA");
-            String tokenA = authenticate(userA.getEmail(), "passA");
+        @Nested
+        @DisplayName("404 not found")
+        class NotFound {
+            @Test
+            @Tag("ApiTest")
+            @Tag("IntegrationTest")
+            @DisplayName("Should return not found if task does not exist")
+            void shouldReturnNotFoundIfTaskDoesNotExist() {
+                UUID invalidId = UUID.randomUUID();
 
-            User userB = registerUser("passB");
-            String tokenB = authenticate(userB.getEmail(), "passB");
-
-            ResponseTaskDTO task =
-                given().contentType("application/json")
-                    .header("Authorization", "Bearer" + tokenA)
-                    .body(EntityBuilder.createRandomCreateTaskDTO())
-                    .when().post("/api/v1/task/create")
-                    .then().statusCode(HttpStatus.CREATED.value())
-                    .extract().as(ResponseTaskDTO.class);
-
-            given().header("Authorization", "Bearer " + tokenB)
-                .when().get("/api/v1/task/spent-time/" + task.id())
-                .then().statusCode(HttpStatus.FORBIDDEN.value());
+                given().header("Authorization", authorizationHeader)
+                        .when().get("/api/v1/task/spent-time/" + invalidId)
+                        .then().statusCode(HttpStatus.NOT_FOUND.value());
+            }
         }
     }
 
