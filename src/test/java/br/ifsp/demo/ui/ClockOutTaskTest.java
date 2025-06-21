@@ -137,8 +137,7 @@ public class ClockOutTaskTest extends BaseSeleniumTest {
         assertThat(taskPage.getTaskTitle()).isEqualTo(title);
         assertThat(taskPage.getTaskDescription()).isEqualTo(description);
         assertThat(taskPage.getTaskStatus()).isEqualTo("Status: PENDING");
-        // "Only In progress tasks can be clocked out."
-        assertThat(taskPage.getErrorMessage()).isEqualTo("Only In progress tasks can be clocked in.");
+        assertThat(taskPage.getErrorMessage()).isEqualTo("Only In progress tasks can be clocked out.");
     }
 
     @Test
