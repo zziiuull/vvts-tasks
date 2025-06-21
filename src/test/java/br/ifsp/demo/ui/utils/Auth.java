@@ -46,4 +46,29 @@ public class Auth {
 
         return taskListPage;
     }
+
+    public static LoginPageObject register(WebDriver driver, String email, String password) {
+        var loginPage = new LoginPageObject(driver);
+        var registerPage = loginPage.navigateToRegisterPage();
+
+        new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class)
+                .until(ExpectedConditions.elementToBeClickable(registerPage.getRegisterButtonLocator()));
+
+        registerPage.fillName(faker.name().firstName());
+        registerPage.fillLastnameField(faker.name().lastName());
+        registerPage.fillEmail(email);
+        registerPage.fillPassword(password);
+        loginPage = registerPage.clickRegisterExpectingSuccess();
+
+        new FluentWait<>(driver)
+            .withTimeout(Duration.ofSeconds(5))
+            .pollingEvery(Duration.ofMillis(500))
+            .ignoring(NoSuchElementException.class)
+            .until(ExpectedConditions.elementToBeClickable(loginPage.getUsernameFieldLocator()));
+
+        return loginPage;
+    }
 }
