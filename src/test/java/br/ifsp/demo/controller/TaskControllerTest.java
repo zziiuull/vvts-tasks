@@ -1181,7 +1181,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
     }
 
     @Nested
-    @DisplayName("GET /clock-out-forgotten/{id}")
+    @DisplayName("GET /clock-out-forgotten-completed-task/{id}")
     class CheckForForgottenCompletedTask {
         @Nested
         @DisplayName("200 OK")
