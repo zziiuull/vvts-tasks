@@ -199,6 +199,7 @@ class TaskControllerTest extends BaseApiIntegrationTest {
                         .contentType("application/json")
                         .port(RestAssured.port)
                         .body(editTaskDTO)
+                        .header("Authorization", authorizationHeader)
                         .when()
                         .put("api/v1/task/edit/" + createdTaskDTO.id())
                         .then()
