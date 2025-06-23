@@ -62,7 +62,7 @@ class JpaTaskRepositoryTest {
     @Tag("PersistenceTest")
     @Tag("IntegrationTest")
     @DisplayName("Should find task by id and user id")
-    void shouldFinddTaskByIdAndUserId() {
+    void shouldFindTaskByIdAndUserId() {
         Optional<TaskEntity> result = taskRepository.findByIdAndUserId(taskA.getId(), userA);
 
         assertThat(result).isPresent();
